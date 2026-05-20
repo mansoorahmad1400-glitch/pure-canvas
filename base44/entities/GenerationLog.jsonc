@@ -1,0 +1,69 @@
+{
+  "name": "GenerationLog",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the associated project"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Email of the user who generated"
+    },
+    "gems_used": {
+      "type": "number",
+      "description": "Number of gems consumed"
+    },
+    "generation_type": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "advanced",
+        "bulk"
+      ],
+      "default": "standard",
+      "description": "Type of generation performed"
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Name of the project at time of generation"
+    },
+    "project_type": {
+      "type": "string",
+      "description": "Type of content generated"
+    }
+  },
+  "required": [
+    "user_id",
+    "gems_used",
+    "generation_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}",
+      "data.user_id": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "nav": {
+    "home": "Home",
+    "studio": "Studio",
+    "projects": "Projects",
+    "tutorial": "Tutorial",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "account": "Account & Settings",
+    "privacy": "Privacy Policy",
+    "upgrade": "Upgrade Plan",
+    "gems": "gems",
+    "admin": "Admin"
+  },
+  "nextSteps": {
+    "title": "Next Steps — Bring It to Life",
+    "subtitle": "Use these AI tools with your blueprint to produce your video",
+    "copied": "Copied!",
+    "copy": "Copy",
+    "open": "Open",
+    "tools": {
+      "grok": {
+        "tagline": "Generate video scenes",
+        "description": "Paste your Visual Prompts into Grok's Aurora model to generate AI video or images for each scene.",
+        "steps": [
+          "Copy your Visual Prompts below",
+          "Open Grok → select Aurora model",
+          "Paste each scene prompt and generate",
+          "Download the generated video/images"
+        ]
+      },
+      "suno": {
+        "tagline": "Create background music",
+        "description": "Copy your Sound & Music prompts and paste them into Suno AI's Custom Mode to generate scene-matched background tracks.",
+        "steps": [
+          "Copy your Sound Prompts below",
+          "Open Suno AI → Create → Custom Mode",
+          "Paste the style description per scene",
+          "Generate and download your music tracks"
+        ]
+      },
+      "elevenlabs": {
+        "tagline": "Generate AI narration",
+        "description": "Use your Narration Guide in ElevenLabs to create realistic voice narration with the correct emotion and pacing for each scene.",
+        "steps": [
+          "Copy your Narration Guide below",
+          "Open ElevenLabs → Speech Synthesis",
+          "Choose a voice & set emotion/style",
+          "Paste narration text and generate audio"
+        ]
+      }
+    }
+  },
+  "home": {
+    "badge": "AI-Powered Production Blueprint Generator",
+    "tagline": "Turn one idea into a full cinematic story system.",
+    "subTagline": "Scene scripts. Visual prompts. Bilingual narration. Music cues. YouTube packaging. All in one generation.",
+    "startCreating": "Start Creating",
+    "startCreatingFree": "Start Creating — It's Free",
+    "signIn": "Sign In",
+    "myProjects": "My Projects",
+    "freeNudge": "Free • 2 lifetime gems • No credit card required",
+    "socialProof": ["Scene-by-scene output", "Dual-language ready", "YouTube packaging", "Premium AI tools"],
+    "howItWorks": {
+      "label": "How It Works",
+      "heading": "Three steps. One complete blueprint.",
+      "steps": [
+        { "num": "01", "title": "Enter Your Idea", "desc": "Name your project, pick the story type, visual style, audience, and languages." },
+        { "num": "02", "title": "AI Builds the Blueprint", "desc": "The engine generates every scene, prompt, narration, music cue, and YouTube asset." },
+        { "num": "03", "title": "Export & Create", "desc": "Copy, download, or save your full production master prompt and start creating." }
+      ]
+    },
+    "features": {
+      "label": "Features",
+      "heading": "Everything a creator needs.",
+      "subheading": "One generation. Nine fully structured output sections. Production-ready from the first click.",
+      "items": [
+        { "title": "Scene-by-Scene Story", "desc": "Every scene written individually — no skips, no shortcuts." },
+        { "title": "Visual Prompt Generation", "desc": "AI-ready prompts for Midjourney, Runway, DALL-E, Kling & more." },
+        { "title": "Bilingual Narration", "desc": "Full narration and dialogue in English + your second language." },
+        { "title": "Music Cues & Timing", "desc": "Scene-specific background music and sound effect directions." },
+        { "title": "YouTube Package", "desc": "Dual-language titles, descriptions, tags, and thumbnail hooks." },
+        { "title": "Thumbnail Concept", "desc": "Creative thumbnail hook text and visual direction included." },
+        { "title": "Saved Projects", "desc": "Save, revisit, and duplicate your production blueprints." },
+        { "title": "Gems-Based System", "desc": "Free gems on signup. Use one gem per generation." },
+        { "title": "Premium Creator Tools", "desc": "Unlock advanced packs, longer stories, multi-output & more." }
+      ]
+    },
+    "plans": {
+      "label": "Plans",
+      "heading": "Choose your plan.",
+      "subheading": "Start free with 2 gems. Upgrade to Starter ($9.99), Creator Pro ($19.99), or Studio Elite ($39.99).",
+      "currentPlan": "✓ Current Plan",
+      "getStartedFree": "Get Started Free",
+      "openStudio": "Open Studio",
+      "upgradeToPro": "Upgrade to Creator Pro",
+      "upgradeToElite": "Upgrade to Studio Elite",
+      "mostPopular": "Most Popular",
+      "perMonth": "/month",
+      "free": {
+        "name": "Free",
+        "features": [
+          "2 lifetime gems",
+          "1 gem per generation",
+          "Scene-by-scene blueprints",
+          "Visual + sound prompts",
+          "Copy & download output",
+          "Monthly gem reset",
+          "Priority generation",
+          "GPT-4o quality"
+        ],
+        "included": [true, true, true, true, true, false, false, false]
+      },
+      "starter": {
+        "name": "Starter",
+        "features": [
+          "200 gems per month",
+          "Monthly gem reset",
+          "1 gem per generation",
+          "Full blueprint output",
+          "Copy & download output"
+        ]
+      },
+      "pro": {
+        "name": "Creator Pro",
+        "features": [
+          "500 gems per month",
+          "Monthly gem reset",
+          "1 gem per generation",
+          "Full blueprint output",
+          "YouTube packaging"
+        ]
+      },
+      "elite": {
+        "name": "Studio Elite",
+        "features": [
+          "1100 gems per month",
+          "GPT-4o quality generation",
+          "Monthly gem reset",
+          "1 gem per generation",
+          "Early feature access"
+        ]
+      }
+    },
+    "cta": {
+      "badge": "Ready to create?",
+      "heading1": "Create your first",
+      "heading2": "cinematic story",
+      "heading3": "today.",
+      "subheading": "Join creators building AI-powered stories, rhymes, and documentaries with StudioOne AI.",
+      "upgrade": "Upgrade"
+    }
+  }
+}

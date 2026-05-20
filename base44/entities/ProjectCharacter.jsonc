@@ -1,0 +1,213 @@
+{
+  "name": "ProjectCharacter",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the associated project"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "name": {
+      "type": "string",
+      "description": "Character name"
+    },
+    "original_name": {
+      "type": "string",
+      "description": "Original extracted name (before renaming)"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "protagonist",
+        "antagonist",
+        "supporting",
+        "narrator",
+        "minor",
+        "background"
+      ],
+      "default": "supporting",
+      "description": "Character role in the story"
+    },
+    "description_short": {
+      "type": "string",
+      "description": "One-line character summary"
+    },
+    "description_full": {
+      "type": "string",
+      "description": "Full visual description used for prompt injection"
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Scene numbers where this character appears"
+    },
+    "lock_type": {
+      "type": "string",
+      "enum": [
+        "none",
+        "text",
+        "image"
+      ],
+      "default": "none",
+      "description": "Locking mode"
+    },
+    "consistency_status": {
+      "type": "string",
+      "enum": [
+        "unlocked",
+        "text_locked",
+        "reference_uploaded",
+        "image_locked",
+        "failed"
+      ],
+      "default": "unlocked",
+      "description": "Current consistency state"
+    },
+    "reference_image_url": {
+      "type": "string",
+      "description": "Uploaded reference image URL"
+    },
+    "provider_embedding_id": {
+      "type": "string",
+      "description": "Future: embedding/identity ID from image provider"
+    },
+    "location_hints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Aliases / alternate names"
+    },
+    "gems_used": {
+      "type": "number",
+      "default": 0,
+      "description": "Gems consumed for image-lock"
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0,
+      "description": "Display order in character hub"
+    },
+    "dna": {
+      "type": "object",
+      "description": "Character DNA \u2014 persistent visual identity profile for consistency engine",
+      "properties": {
+        "gender": {
+          "type": "string"
+        },
+        "age_range": {
+          "type": "string"
+        },
+        "ethnicity": {
+          "type": "string"
+        },
+        "facial_structure": {
+          "type": "string"
+        },
+        "hairstyle": {
+          "type": "string"
+        },
+        "beard_makeup": {
+          "type": "string"
+        },
+        "clothing_style": {
+          "type": "string"
+        },
+        "color_palette": {
+          "type": "string"
+        },
+        "body_type": {
+          "type": "string"
+        },
+        "accessories": {
+          "type": "string"
+        },
+        "personality_vibe": {
+          "type": "string"
+        },
+        "emotional_tone": {
+          "type": "string"
+        },
+        "voice_tone": {
+          "type": "string"
+        },
+        "style_category": {
+          "type": "string"
+        },
+        "consistency_prompt": {
+          "type": "string",
+          "description": "Compact injected prompt string for generation"
+        },
+        "video_consistency_data": {
+          "type": "object",
+          "description": "Reusable data for Kling, Runway, Pika, Luma, Grok video",
+          "properties": {
+            "character_seed": {
+              "type": "string"
+            },
+            "motion_style": {
+              "type": "string"
+            },
+            "face_reference_url": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "consistency_score": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 score indicating how locked-in the character's visual consistency is"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "name"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

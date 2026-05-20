@@ -1,0 +1,121 @@
+{
+  "name": "StoryboardScene",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the associated project"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "scene_number": {
+      "type": "number",
+      "description": "Scene number (1-based)"
+    },
+    "visual_prompt": {
+      "type": "string",
+      "description": "Full visual prompt for this scene"
+    },
+    "aspect_ratio": {
+      "type": "string",
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1"
+      ],
+      "default": "16:9",
+      "description": "Aspect ratio for image generation"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL of the generated image"
+    },
+    "image_provider": {
+      "type": "string",
+      "description": "Provider used for generation (e.g. openai, grok, flux)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "generating",
+        "completed",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Image generation status"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this frame has been approved"
+    },
+    "approved_at": {
+      "type": "string",
+      "description": "ISO timestamp of approval"
+    },
+    "approved_image_url": {
+      "type": "string",
+      "description": "Locked approved image URL"
+    },
+    "approved_prompt": {
+      "type": "string",
+      "description": "Locked approved prompt at time of approval"
+    },
+    "gems_used": {
+      "type": "number",
+      "default": 0,
+      "description": "Gems consumed for image generation"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if generation failed"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "scene_number"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

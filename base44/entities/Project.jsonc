@@ -1,0 +1,217 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Project name/title"
+    },
+    "project_type": {
+      "type": "string",
+      "enum": [
+        "story",
+        "rhyme",
+        "documentary",
+        "fairy_tale",
+        "adventure",
+        "educational",
+        "mythology",
+        "folktale",
+        "fantasy",
+        "mystery"
+      ],
+      "description": "Type of content"
+    },
+    "style": {
+      "type": "string",
+      "description": "Visual tool used"
+    },
+    "visual_style_key": {
+      "type": "string",
+      "description": "Resolved image style preset key derived from project type, genre, and audience (e.g. pixar_style, cinematic_realistic, fantasy)"
+    },
+    "genre": {
+      "type": "string",
+      "description": "Content genre (e.g. kids_animated, fantasy, drama, thriller, anime, historical)"
+    },
+    "tone": {
+      "type": "string",
+      "description": "Overall tone (e.g. warm, dark, dramatic, playful, epic)"
+    },
+    "mood": {
+      "type": "string",
+      "description": "Emotional mood of the project"
+    },
+    "target_format": {
+      "type": "string",
+      "description": "Target output format (e.g. youtube_shorts, youtube_long, cinematic)"
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "kids",
+        "family",
+        "teens",
+        "adults",
+        "universal"
+      ],
+      "description": "Target audience"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Languages for narration"
+    },
+    "idea_description": {
+      "type": "string",
+      "description": "Brief description of the idea"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "generating",
+        "completed",
+        "error"
+      ],
+      "default": "completed"
+    },
+    "master_prompt": {
+      "type": "string",
+      "description": "Generated master story prompt"
+    },
+    "visual_prompt": {
+      "type": "string",
+      "description": "Generated visual creation prompts"
+    },
+    "sound_prompt": {
+      "type": "string",
+      "description": "Generated sound and music prompts"
+    },
+    "narration_guide": {
+      "type": "string",
+      "description": "Generated narration guide"
+    },
+    "youtube_title": {
+      "type": "string"
+    },
+    "youtube_description": {
+      "type": "string"
+    },
+    "youtube_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "thumbnail_concept": {
+      "type": "string"
+    },
+    "youtube_package": {
+      "type": "object",
+      "description": "Full YouTube package output",
+      "properties": {
+        "title_primary": {
+          "type": "string"
+        },
+        "title_secondary": {
+          "type": "string"
+        },
+        "description_primary": {
+          "type": "string"
+        },
+        "description_secondary": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "string"
+        },
+        "thumbnail_hook_primary": {
+          "type": "string"
+        },
+        "thumbnail_hook_secondary": {
+          "type": "string"
+        }
+      }
+    },
+    "gems_used": {
+      "type": "number",
+      "description": "Gems consumed for this project",
+      "default": 1
+    },
+    "generation_type": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "advanced"
+      ],
+      "default": "standard"
+    },
+    "scene_count": {
+      "type": "number",
+      "description": "Number of scenes generated"
+    },
+    "recommended_tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tool_name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "usage_note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "title",
+    "project_type"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

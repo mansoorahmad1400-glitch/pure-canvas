@@ -1,0 +1,142 @@
+{
+  "name": "ExportJob",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the associated project"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "export_type": {
+      "type": "string",
+      "enum": [
+        "storyboard_pdf",
+        "image_zip",
+        "audio_zip",
+        "prompt_pack",
+        "shorts_480p",
+        "shorts_720p",
+        "cinematic_1080p",
+        "subtitles_srt",
+        "narration_script"
+      ],
+      "description": "Type of export"
+    },
+    "resolution": {
+      "type": "string",
+      "enum": [
+        "480p",
+        "720p",
+        "1080p",
+        "n/a"
+      ],
+      "default": "n/a"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "mp4",
+        "pdf",
+        "zip",
+        "txt",
+        "srt"
+      ],
+      "default": "zip"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Render provider used (ffmpeg, runway, kling, luma, sora, none)"
+    },
+    "scenes_count": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "preparing",
+        "rendering",
+        "complete",
+        "failed"
+      ],
+      "default": "queued"
+    },
+    "export_url": {
+      "type": "string",
+      "description": "URL of the completed export file"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "Thumbnail preview URL"
+    },
+    "gems_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "gems_refunded": {
+      "type": "number",
+      "default": 0
+    },
+    "failed_reason": {
+      "type": "string"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "ISO timestamp when completed"
+    },
+    "file_size_kb": {
+      "type": "number"
+    },
+    "duration_seconds": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "export_type"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

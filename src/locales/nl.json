@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "Home",
+    "studio": "Studio",
+    "projects": "Projecten",
+    "tutorial": "Tutorial",
+    "signIn": "Inloggen",
+    "signOut": "Uitloggen",
+    "account": "Account & Instellingen",
+    "privacy": "Privacybeleid",
+    "upgrade": "Plan upgraden",
+    "gems": "gems",
+    "admin": "Admin"
+  },
+  "nextSteps": {
+    "title": "Volgende stappen — Breng het tot leven",
+    "subtitle": "Gebruik deze AI-tools met je blueprint om je video te produceren",
+    "copied": "Gekopieerd!",
+    "copy": "Kopieer",
+    "open": "Open",
+    "tools": {
+      "grok": {
+        "tagline": "Videoscènes genereren",
+        "description": "Plak je Visuele Prompts in het Aurora-model van Grok om AI-video of afbeeldingen voor elke scène te genereren.",
+        "steps": [
+          "Kopieer je Visuele Prompts hieronder",
+          "Open Grok → selecteer Aurora-model",
+          "Plak elke scèneprompt en genereer",
+          "Download de gegenereerde video/afbeeldingen"
+        ]
+      },
+      "suno": {
+        "tagline": "Achtergrondmuziek maken",
+        "description": "Kopieer je Geluid & Muziek-prompts en plak ze in de Aangepaste Modus van Suno AI om scènepassende achtergrondnummers te genereren.",
+        "steps": [
+          "Kopieer je Geluidsprompts hieronder",
+          "Open Suno AI → Maken → Aangepaste Modus",
+          "Plak de stijlbeschrijving per scène",
+          "Genereer en download je muzieknummers"
+        ]
+      },
+      "elevenlabs": {
+        "tagline": "AI-vertelling genereren",
+        "description": "Gebruik je Vertelgids in ElevenLabs om realistische stemvertelling te maken met de juiste emotie en timing voor elke scène.",
+        "steps": [
+          "Kopieer je Vertelgids hieronder",
+          "Open ElevenLabs → Spraakmachines",
+          "Kies een stem en stel emotie/stijl in",
+          "Plak vertelingstekst en genereer audio"
+        ]
+      }
+    }
+  },
+  "home": {
+    "badge": "AI-Gestuurde Productieblueprint Generator",
+    "tagline": "Verander één idee in een volledig cinematografisch verhaalsysteem.",
+    "subTagline": "Scènescripts. Visuele prompts. Tweetalige vertelling. Muziekaanwijzingen. YouTube-packaging. Alles in één generatie.",
+    "startCreating": "Begin met maken",
+    "startCreatingFree": "Begin gratis met maken",
+    "signIn": "Inloggen",
+    "myProjects": "Mijn projecten",
+    "freeNudge": "Gratis • 2 gems inbegrepen • Geen creditcard vereist",
+    "socialProof": ["Scène-voor-scène uitvoer", "Tweetal klaar", "YouTube-packaging", "Premium AI-tools"],
+    "howItWorks": {
+      "label": "Hoe het werkt",
+      "heading": "Drie stappen. Één complete blueprint.",
+      "steps": [
+        { "num": "01", "title": "Voer je idee in", "desc": "Geef je project een naam, kies het verhaaltype, visuele stijl, doelgroep en talen." },
+        { "num": "02", "title": "AI bouwt de blueprint", "desc": "De engine genereert elke scène, prompt, vertelling, muziekaanwijzing en YouTube-asset." },
+        { "num": "03", "title": "Exporteer & Maak", "desc": "Kopieer, download of sla je volledige productieprompt op en begin met maken." }
+      ]
+    },
+    "features": {
+      "label": "Functies",
+      "heading": "Alles wat een maker nodig heeft.",
+      "subheading": "Één generatie. Negen volledig gestructureerde uitvoersecties. Productie-klaar vanaf de eerste klik.",
+      "items": [
+        { "title": "Scène-voor-scène verhaal", "desc": "Elke scène individueel geschreven — geen overslaan, geen shortcuts." },
+        { "title": "Visuele Prompt Generatie", "desc": "AI-klare prompts voor Midjourney, Runway, DALL-E, Kling & meer." },
+        { "title": "Tweetalige vertelling", "desc": "Volledige vertelling en dialoog in Engels + je tweede taal." },
+        { "title": "Muziekaanwijzingen & Timing", "desc": "Scènespecifieke achtergrondmuziek en geluidseffecten." },
+        { "title": "YouTube-pakket", "desc": "Tweetalige titels, beschrijvingen, tags en miniatuurhaken." },
+        { "title": "Miniatuurconcept", "desc": "Creatieve haaktop en visuele richting voor je miniatuur." },
+        { "title": "Opgeslagen projecten", "desc": "Sla je productieblueprints op, revisit en dupliceer ze." },
+        { "title": "Gems-systeem", "desc": "Gratis gems bij aanmelding. Gebruik één gem per generatie." },
+        { "title": "Premium makertools", "desc": "Ontgrendel geavanceerde pakketten, langere verhalen en meer." }
+      ]
+    },
+    "plans": {
+      "label": "Plannen",
+      "heading": "Kies je plan.",
+      "subheading": "Begin gratis met 2 gems. Upgrade naar Creator Pro (500/mo) of Studio Elite (1200/mo).",
+      "currentPlan": "✓ Huidig plan",
+      "getStartedFree": "Gratis beginnen",
+      "openStudio": "Studio openen",
+      "upgradeToPro": "Upgraden naar Creator Pro",
+      "upgradeToElite": "Upgraden naar Studio Elite",
+      "mostPopular": "Meest populair",
+      "perMonth": "/maand",
+      "free": {
+        "name": "Gratis Starter",
+        "features": [
+          "2 gems totaal (geen reset)",
+          "1 gem per generatie",
+          "Scène-voor-scène blueprints",
+          "Visuele + geluidsprompts",
+          "Uitvoer kopiëren & downloaden",
+          "Maandelijkse gem-reset",
+          "Prioriteitsgeneratie",
+          "Uitgebreide scèneondersteuning",
+          "Vroege toegang tot functies"
+        ],
+        "included": [true, true, true, true, true, false, false, false, false]
+      },
+      "pro": {
+        "name": "Creator Pro",
+        "features": [
+          "500 gems per maand",
+          "Maandelijkse gem-reset",
+          "Tot 16 scènes per project",
+          "Prioriteitsgeneratiemodus",
+          "Uitgebreide uitvoercapaciteit",
+          "Uitvoer kopiëren & downloaden",
+          "YouTube-optimalisatiepakket",
+          "Alle gratis functies inbegrepen"
+        ]
+      },
+      "elite": {
+        "name": "Studio Elite",
+        "features": [
+          "1200 gems per maand",
+          "Snellere generatieprioriteit",
+          "Tot 20 scènes per project",
+          "Uitgebreide uitvoercapaciteit",
+          "Prioriteitswachtrij",
+          "Vroege toegang tot functies",
+          "YouTube-optimalisatiepakket",
+          "Alle premiumfuncties inbegrepen"
+        ]
+      }
+    },
+    "cta": {
+      "badge": "Klaar om te maken?",
+      "heading1": "Maak je eerste",
+      "heading2": "cinematografisch verhaal",
+      "heading3": "vandaag.",
+      "subheading": "Sluit je aan bij makers die AI-verhalen, rijmpjes en documentaires bouwen met StudioOne AI.",
+      "upgrade": "Upgraden"
+    }
+  }
+}

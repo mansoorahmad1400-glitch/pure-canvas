@@ -1,0 +1,132 @@
+{
+  "name": "AudioJob",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the associated project"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "scene_number": {
+      "type": "number",
+      "description": "Scene number (1-based)"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Audio provider used (elevenlabs, openai_tts, google_tts, suno, udio, stable_audio, playht)"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "narration",
+        "sound_effects",
+        "music",
+        "full_package",
+        "uploaded"
+      ],
+      "description": "Type of audio generated"
+    },
+    "language": {
+      "type": "string",
+      "description": "Language code or name (e.g. en, ur, hi, ar, ps, fr, nl)"
+    },
+    "voice_style": {
+      "type": "string",
+      "description": "Voice style key (e.g. narrator_cinematic, narrator_dramatic)"
+    },
+    "prompt_text": {
+      "type": "string",
+      "description": "Text or direction used for generation"
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "URL of the generated or uploaded audio file"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration in seconds"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "generating",
+        "completed",
+        "failed",
+        "approved"
+      ],
+      "default": "pending"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false
+    },
+    "sent_to_export": {
+      "type": "boolean",
+      "default": false
+    },
+    "gems_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "gems_refunded": {
+      "type": "number",
+      "default": 0
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "ISO timestamp when completed"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "scene_number",
+    "action_type"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

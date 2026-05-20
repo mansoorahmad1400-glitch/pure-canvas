@@ -1,0 +1,172 @@
+{
+  "name": "WorldLocation",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Owner email"
+    },
+    "canonical_name": {
+      "type": "string",
+      "description": "Primary display name (e.g. 'Agrabah Palace')"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Other names this location is called"
+    },
+    "location_type": {
+      "type": "string",
+      "enum": [
+        "interior",
+        "exterior",
+        "city",
+        "nature",
+        "fantasy",
+        "vehicle",
+        "other"
+      ],
+      "default": "exterior"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full visual description for prompt injection"
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Scene numbers where this location appears"
+    },
+    "lock_type": {
+      "type": "string",
+      "enum": [
+        "none",
+        "text",
+        "image"
+      ],
+      "default": "none"
+    },
+    "consistency_score": {
+      "type": "number",
+      "default": 0
+    },
+    "reference_image_url": {
+      "type": "string",
+      "description": "Approved environment reference image"
+    },
+    "dna": {
+      "type": "object",
+      "description": "Location DNA \u2014 persistent visual identity for consistency engine",
+      "properties": {
+        "architectural_style": {
+          "type": "string"
+        },
+        "color_palette": {
+          "type": "string"
+        },
+        "lighting_profile": {
+          "type": "string"
+        },
+        "atmosphere": {
+          "type": "string"
+        },
+        "time_of_day": {
+          "type": "string"
+        },
+        "weather": {
+          "type": "string"
+        },
+        "materials": {
+          "type": "string"
+        },
+        "props": {
+          "type": "string"
+        },
+        "camera_style": {
+          "type": "string"
+        },
+        "color_grading": {
+          "type": "string"
+        },
+        "emotional_tone": {
+          "type": "string"
+        },
+        "consistency_prompt": {
+          "type": "string",
+          "description": "Compact injected prompt for generation"
+        },
+        "video_consistency_data": {
+          "type": "object",
+          "description": "Reusable data for video generation continuity",
+          "properties": {
+            "camera_movement": {
+              "type": "string"
+            },
+            "transition_style": {
+              "type": "string"
+            },
+            "environment_seed": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "canonical_name"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

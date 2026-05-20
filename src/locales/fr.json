@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "studio": "Studio",
+    "projects": "Projets",
+    "tutorial": "Tutoriel",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "account": "Compte & Paramètres",
+    "privacy": "Politique de confidentialité",
+    "upgrade": "Améliorer le plan",
+    "gems": "gemmes",
+    "admin": "Admin"
+  },
+  "nextSteps": {
+    "title": "Prochaines étapes — Donnez vie à votre projet",
+    "subtitle": "Utilisez ces outils IA avec votre blueprint pour produire votre vidéo",
+    "copied": "Copié !",
+    "copy": "Copier",
+    "open": "Ouvrir",
+    "tools": {
+      "grok": {
+        "tagline": "Générer des scènes vidéo",
+        "description": "Collez vos Invites Visuelles dans le modèle Aurora de Grok pour générer des vidéos ou images IA pour chaque scène.",
+        "steps": [
+          "Copiez vos Invites Visuelles ci-dessous",
+          "Ouvrez Grok → sélectionnez le modèle Aurora",
+          "Collez chaque invite de scène et générez",
+          "Téléchargez les vidéos/images générées"
+        ]
+      },
+      "suno": {
+        "tagline": "Créer de la musique de fond",
+        "description": "Copiez vos invites Musique & Son et collez-les dans le Mode Personnalisé de Suno AI pour générer des pistes correspondant aux scènes.",
+        "steps": [
+          "Copiez vos Invites Sonores ci-dessous",
+          "Ouvrez Suno AI → Créer → Mode Personnalisé",
+          "Collez la description de style par scène",
+          "Générez et téléchargez vos pistes musicales"
+        ]
+      },
+      "elevenlabs": {
+        "tagline": "Générer une narration IA",
+        "description": "Utilisez votre Guide de Narration dans ElevenLabs pour créer une narration vocale réaliste avec les bonnes émotions et le bon rythme.",
+        "steps": [
+          "Copiez votre Guide de Narration ci-dessous",
+          "Ouvrez ElevenLabs → Synthèse Vocale",
+          "Choisissez une voix et réglez l'émotion/style",
+          "Collez le texte de narration et générez l'audio"
+        ]
+      }
+    }
+  },
+  "home": {
+    "badge": "Générateur de Blueprint de Production IA",
+    "tagline": "Transformez une idée en un système d'histoire cinématographique complet.",
+    "subTagline": "Scripts de scènes. Invites visuelles. Narration bilingue. Repères musicaux. Packaging YouTube. En une seule génération.",
+    "startCreating": "Commencer à créer",
+    "startCreatingFree": "Commencer gratuitement",
+    "signIn": "Se connecter",
+    "myProjects": "Mes projets",
+    "freeNudge": "Gratuit • 2 gemmes incluses • Aucune carte de crédit requise",
+    "socialProof": ["Sortie scène par scène", "Prêt pour deux langues", "Packaging YouTube", "Outils IA premium"],
+    "howItWorks": {
+      "label": "Comment ça marche",
+      "heading": "Trois étapes. Un blueprint complet.",
+      "steps": [
+        { "num": "01", "title": "Entrez votre idée", "desc": "Nommez votre projet, choisissez le type d'histoire, le style visuel, le public et les langues." },
+        { "num": "02", "title": "L'IA construit le blueprint", "desc": "Le moteur génère chaque scène, invite, narration, repère musical et ressource YouTube." },
+        { "num": "03", "title": "Exportez & Créez", "desc": "Copiez, téléchargez ou sauvegardez votre invite maîtresse et commencez à créer." }
+      ]
+    },
+    "features": {
+      "label": "Fonctionnalités",
+      "heading": "Tout ce dont un créateur a besoin.",
+      "subheading": "Une génération. Neuf sections de sortie entièrement structurées. Prêt à la production dès le premier clic.",
+      "items": [
+        { "title": "Histoire scène par scène", "desc": "Chaque scène écrite individuellement — sans raccourcis." },
+        { "title": "Génération d'invites visuelles", "desc": "Invites prêtes pour Midjourney, Runway, DALL-E, Kling et plus." },
+        { "title": "Narration bilingue", "desc": "Narration et dialogues complets en anglais + votre deuxième langue." },
+        { "title": "Repères musicaux & timing", "desc": "Musique de fond et effets sonores spécifiques à chaque scène." },
+        { "title": "Package YouTube", "desc": "Titres, descriptions, tags et accroches de miniatures en deux langues." },
+        { "title": "Concept de miniature", "desc": "Texte d'accroche créatif et direction visuelle pour la miniature." },
+        { "title": "Projets sauvegardés", "desc": "Sauvegardez, revisitez et dupliquez vos blueprints de production." },
+        { "title": "Système de gemmes", "desc": "Gemmes gratuites à l'inscription. Une gemme par génération." },
+        { "title": "Outils créateurs premium", "desc": "Débloquez des packs avancés, des histoires plus longues et plus." }
+      ]
+    },
+    "plans": {
+      "label": "Plans",
+      "heading": "Choisissez votre plan.",
+      "subheading": "Commencez gratuitement avec 2 gemmes. Passez à Creator Pro (500/mois) ou Studio Elite (1200/mois).",
+      "currentPlan": "✓ Plan actuel",
+      "getStartedFree": "Commencer gratuitement",
+      "openStudio": "Ouvrir le Studio",
+      "upgradeToPro": "Passer à Creator Pro",
+      "upgradeToElite": "Passer à Studio Elite",
+      "mostPopular": "Le plus populaire",
+      "perMonth": "/mois",
+      "free": {
+        "name": "Démarrage Gratuit",
+        "features": [
+          "2 gemmes au total (sans reset)",
+          "1 gemme par génération",
+          "Blueprints scène par scène",
+          "Invites visuelles + sonores",
+          "Copier & télécharger la sortie",
+          "Reset mensuel de gemmes",
+          "Génération prioritaire",
+          "Support de scènes étendu",
+          "Accès anticipé aux fonctionnalités"
+        ],
+        "included": [true, true, true, true, true, false, false, false, false]
+      },
+      "pro": {
+        "name": "Creator Pro",
+        "features": [
+          "500 gemmes par mois",
+          "Reset mensuel de gemmes",
+          "Jusqu'à 16 scènes par projet",
+          "Mode de génération prioritaire",
+          "Capacité de sortie étendue",
+          "Copier & télécharger la sortie",
+          "Package d'optimisation YouTube",
+          "Toutes les fonctionnalités gratuites incluses"
+        ]
+      },
+      "elite": {
+        "name": "Studio Elite",
+        "features": [
+          "1200 gemmes par mois",
+          "Priorité de génération plus rapide",
+          "Jusqu'à 20 scènes par projet",
+          "Capacité de sortie étendue",
+          "Gestion de file d'attente prioritaire",
+          "Accès anticipé aux fonctionnalités",
+          "Package d'optimisation YouTube",
+          "Toutes les fonctionnalités premium incluses"
+        ]
+      }
+    },
+    "cta": {
+      "badge": "Prêt à créer ?",
+      "heading1": "Créez votre première",
+      "heading2": "histoire cinématographique",
+      "heading3": "aujourd'hui.",
+      "subheading": "Rejoignez les créateurs qui construisent des histoires, comptines et documentaires avec StudioOne AI.",
+      "upgrade": "Améliorer"
+    }
+  }
+}

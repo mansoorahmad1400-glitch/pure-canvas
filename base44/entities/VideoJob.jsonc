@@ -1,0 +1,173 @@
+{
+  "name": "VideoJob",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the associated project"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "scene_number": {
+      "type": "number",
+      "description": "Scene number (1-based)"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Video provider used (runway, kling, sora, pika, luma, grok_video, grok_imagine_video, replicate)"
+    },
+    "resolution": {
+      "type": "string",
+      "enum": [
+        "480p",
+        "720p"
+      ],
+      "default": "480p",
+      "description": "Output resolution"
+    },
+    "duration": {
+      "type": "number",
+      "enum": [
+        6,
+        10,
+        15
+      ],
+      "default": 6,
+      "description": "Clip duration in seconds"
+    },
+    "motion_prompt": {
+      "type": "string",
+      "description": "Motion/animation prompt for this scene"
+    },
+    "transition_directive": {
+      "type": "string",
+      "description": "Transition to next scene directive"
+    },
+    "anchor_image_url": {
+      "type": "string",
+      "description": "Approved storyboard frame used as anchor"
+    },
+    "first_frame_url": {
+      "type": "string",
+      "description": "First frame reference for chaining"
+    },
+    "last_frame_url": {
+      "type": "string",
+      "description": "Last frame reference for chaining"
+    },
+    "prev_scene_last_frame": {
+      "type": "string",
+      "description": "Previous scene's final frame (for continuity)"
+    },
+    "next_scene_first_frame": {
+      "type": "string",
+      "description": "Next scene's starting frame (for continuity)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "queued",
+        "rendering",
+        "completed",
+        "failed"
+      ],
+      "default": "not_started",
+      "description": "Job status"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this animated clip has been approved (gate for Audio Studio)"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "URL of the generated video clip"
+    },
+    "provider_data": {
+      "type": "object",
+      "description": "Provider-specific data (e.g. xai_prediction_id, response metadata)",
+      "properties": {
+        "xai_prediction_id": {
+          "type": "string"
+        },
+        "last_request_payload": {
+          "type": "object"
+        },
+        "provider_response": {
+          "type": "object"
+        },
+        "latency_ms": {
+          "type": "number"
+        },
+        "estimated_cost": {
+          "type": "number"
+        }
+      }
+    },
+    "gems_cost": {
+      "type": "number",
+      "default": 0,
+      "description": "Gems charged for this job"
+    },
+    "gems_refunded": {
+      "type": "number",
+      "default": 0,
+      "description": "Gems refunded on failure"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if job failed"
+    },
+    "completed_at": {
+      "type": "string",
+      "description": "ISO timestamp when job completed"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "scene_number"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

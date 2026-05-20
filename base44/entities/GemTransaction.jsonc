@@ -1,0 +1,112 @@
+{
+  "name": "GemTransaction",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user"
+    },
+    "plan_name": {
+      "type": "string",
+      "description": "Subscription plan at time of transaction"
+    },
+    "action_key": {
+      "type": "string",
+      "description": "Machine key of the action (e.g. generate_blueprint)"
+    },
+    "action_label": {
+      "type": "string",
+      "description": "Human-readable action name"
+    },
+    "action_category": {
+      "type": "string",
+      "enum": [
+        "text",
+        "image",
+        "video",
+        "audio",
+        "export",
+        "system",
+        "admin"
+      ],
+      "description": "Category of the action"
+    },
+    "gems_deducted": {
+      "type": "number",
+      "default": 0,
+      "description": "Gems removed from balance"
+    },
+    "gems_refunded": {
+      "type": "number",
+      "default": 0,
+      "description": "Gems returned to balance (on failure or manual refund)"
+    },
+    "balance_before": {
+      "type": "number",
+      "description": "Gem balance before this transaction"
+    },
+    "balance_after": {
+      "type": "number",
+      "description": "Gem balance after this transaction"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failed",
+        "refunded",
+        "pending",
+        "adjustment"
+      ],
+      "default": "success",
+      "description": "Transaction status"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if the action failed"
+    },
+    "admin_note": {
+      "type": "string",
+      "description": "Admin note for manual adjustments"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Associated project ID if applicable"
+    }
+  },
+  "required": [
+    "user_email",
+    "action_key",
+    "action_category",
+    "status"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

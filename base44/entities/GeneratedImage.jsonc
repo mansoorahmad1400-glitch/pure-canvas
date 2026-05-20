@@ -1,0 +1,139 @@
+{
+  "name": "GeneratedImage",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID of the project"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "scene_number": {
+      "type": "number",
+      "description": "Scene number (1-based)"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Image provider used (openai, dalle, flux, midjourney, sdxl, ideogram, leonardo, recraft, grok_image)"
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Full composed prompt sent to the provider"
+    },
+    "style_preset": {
+      "type": "string",
+      "description": "Selected style preset key"
+    },
+    "aspect_ratio": {
+      "type": "string",
+      "enum": [
+        "16:9",
+        "9:16",
+        "1:1",
+        "21:9"
+      ],
+      "default": "16:9"
+    },
+    "quality": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "hd"
+      ],
+      "default": "standard"
+    },
+    "consistency_mode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether character consistency injection was used"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Full-size generated image URL"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "Thumbnail URL (same as image_url for now)"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false
+    },
+    "master_frame": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marked as the master reference frame for this scene"
+    },
+    "sent_to_video": {
+      "type": "boolean",
+      "default": false,
+      "description": "Sent to video pipeline as anchor"
+    },
+    "gems_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "generation_time_ms": {
+      "type": "number",
+      "description": "Time taken to generate in ms"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "generating",
+        "completed",
+        "failed"
+      ],
+      "default": "generating"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_id",
+    "scene_number"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

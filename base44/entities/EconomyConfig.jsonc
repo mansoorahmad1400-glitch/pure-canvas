@@ -1,0 +1,69 @@
+{
+  "name": "EconomyConfig",
+  "type": "object",
+  "properties": {
+    "config_key": {
+      "type": "string",
+      "description": "Unique key identifying this config block (e.g. 'main')"
+    },
+    "plans": {
+      "type": "object",
+      "description": "Per-plan settings",
+      "properties": {
+        "free": {
+          "type": "object"
+        },
+        "starter": {
+          "type": "object"
+        },
+        "premium": {
+          "type": "object"
+        },
+        "elite": {
+          "type": "object"
+        }
+      }
+    },
+    "gem_economy": {
+      "type": "object",
+      "description": "Gem cost and reward settings"
+    },
+    "model_costs": {
+      "type": "object",
+      "description": "AI model cost assignments per generation type"
+    },
+    "feature_access": {
+      "type": "object",
+      "description": "Feature toggles per subscription tier"
+    },
+    "action_costs": {
+      "type": "object",
+      "description": "Gem cost per user action (text, image, video, audio, export)"
+    }
+  },
+  "required": [
+    "config_key"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

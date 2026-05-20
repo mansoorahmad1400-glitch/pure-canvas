@@ -1,0 +1,76 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "admin",
+        "premium",
+        "elite",
+        "starter"
+      ],
+      "default": "user"
+    },
+    "gems_balance": {
+      "type": "number",
+      "description": "Current gem balance",
+      "default": 2
+    },
+    "gems_used_this_month": {
+      "type": "number",
+      "description": "Gems used this month",
+      "default": 0
+    },
+    "gems_limit_monthly": {
+      "type": "number",
+      "description": "Monthly gem limit based on plan"
+    },
+    "gems_reset_date": {
+      "type": "string",
+      "description": "ISO date when gems next reset"
+    },
+    "subscription_plan": {
+      "type": "string",
+      "description": "Current subscription plan key (starter/premium/elite)"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "cancelling",
+        "cancelled",
+        "trialing"
+      ],
+      "description": "Stripe subscription status"
+    },
+    "subscription_reset_date": {
+      "type": "string",
+      "description": "ISO date when subscription renews"
+    },
+    "subscription_cancel_at": {
+      "type": "string",
+      "description": "ISO date when subscription will be cancelled (if cancelling)"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe customer ID for billing"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID"
+    },
+    "billing_issue": {
+      "type": "boolean",
+      "description": "True if there is an active billing/payment issue",
+      "default": false
+    },
+    "billing_issue_since": {
+      "type": "string",
+      "description": "ISO date when billing issue was first detected"
+    }
+  },
+  "required": []
+}
