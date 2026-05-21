@@ -14,7 +14,867 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      AudioJob: {
+        Row: {
+          action_type: string
+          approved: boolean | null
+          audio_url: string | null
+          completed_at: string | null
+          created_by_id: string | null
+          created_date: string
+          duration: number | null
+          error_message: string | null
+          gems_cost: number | null
+          gems_refunded: number | null
+          id: string
+          language: string | null
+          project_id: string
+          prompt_text: string | null
+          provider: string | null
+          scene_number: number
+          sent_to_export: boolean | null
+          status: string | null
+          updated_date: string
+          user_id: string
+          voice_style: string | null
+        }
+        Insert: {
+          action_type: string
+          approved?: boolean | null
+          audio_url?: string | null
+          completed_at?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          duration?: number | null
+          error_message?: string | null
+          gems_cost?: number | null
+          gems_refunded?: number | null
+          id?: string
+          language?: string | null
+          project_id: string
+          prompt_text?: string | null
+          provider?: string | null
+          scene_number: number
+          sent_to_export?: boolean | null
+          status?: string | null
+          updated_date?: string
+          user_id: string
+          voice_style?: string | null
+        }
+        Update: {
+          action_type?: string
+          approved?: boolean | null
+          audio_url?: string | null
+          completed_at?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          duration?: number | null
+          error_message?: string | null
+          gems_cost?: number | null
+          gems_refunded?: number | null
+          id?: string
+          language?: string | null
+          project_id?: string
+          prompt_text?: string | null
+          provider?: string | null
+          scene_number?: number
+          sent_to_export?: boolean | null
+          status?: string | null
+          updated_date?: string
+          user_id?: string
+          voice_style?: string | null
+        }
+        Relationships: []
+      }
+      EconomyConfig: {
+        Row: {
+          action_costs: Json | null
+          config_key: string
+          created_by_id: string | null
+          created_date: string
+          feature_access: Json | null
+          gem_economy: Json | null
+          id: string
+          model_costs: Json | null
+          plans: Json | null
+          updated_date: string
+        }
+        Insert: {
+          action_costs?: Json | null
+          config_key: string
+          created_by_id?: string | null
+          created_date?: string
+          feature_access?: Json | null
+          gem_economy?: Json | null
+          id?: string
+          model_costs?: Json | null
+          plans?: Json | null
+          updated_date?: string
+        }
+        Update: {
+          action_costs?: Json | null
+          config_key?: string
+          created_by_id?: string | null
+          created_date?: string
+          feature_access?: Json | null
+          gem_economy?: Json | null
+          id?: string
+          model_costs?: Json | null
+          plans?: Json | null
+          updated_date?: string
+        }
+        Relationships: []
+      }
+      ExportJob: {
+        Row: {
+          completed_at: string | null
+          created_by_id: string | null
+          created_date: string
+          duration_seconds: number | null
+          export_type: string
+          export_url: string | null
+          failed_reason: string | null
+          file_size_kb: number | null
+          format: string | null
+          gems_cost: number | null
+          gems_refunded: number | null
+          id: string
+          project_id: string
+          provider: string | null
+          resolution: string | null
+          scenes_count: number | null
+          status: string | null
+          thumbnail_url: string | null
+          updated_date: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          duration_seconds?: number | null
+          export_type: string
+          export_url?: string | null
+          failed_reason?: string | null
+          file_size_kb?: number | null
+          format?: string | null
+          gems_cost?: number | null
+          gems_refunded?: number | null
+          id?: string
+          project_id: string
+          provider?: string | null
+          resolution?: string | null
+          scenes_count?: number | null
+          status?: string | null
+          thumbnail_url?: string | null
+          updated_date?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          duration_seconds?: number | null
+          export_type?: string
+          export_url?: string | null
+          failed_reason?: string | null
+          file_size_kb?: number | null
+          format?: string | null
+          gems_cost?: number | null
+          gems_refunded?: number | null
+          id?: string
+          project_id?: string
+          provider?: string | null
+          resolution?: string | null
+          scenes_count?: number | null
+          status?: string | null
+          thumbnail_url?: string | null
+          updated_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      GemTransaction: {
+        Row: {
+          action_category: string
+          action_key: string
+          action_label: string | null
+          admin_note: string | null
+          balance_after: number | null
+          balance_before: number | null
+          created_by_id: string | null
+          created_date: string
+          error_message: string | null
+          gems_deducted: number | null
+          gems_refunded: number | null
+          id: string
+          plan_name: string | null
+          project_id: string | null
+          status: string
+          updated_date: string
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          action_category: string
+          action_key: string
+          action_label?: string | null
+          admin_note?: string | null
+          balance_after?: number | null
+          balance_before?: number | null
+          created_by_id?: string | null
+          created_date?: string
+          error_message?: string | null
+          gems_deducted?: number | null
+          gems_refunded?: number | null
+          id?: string
+          plan_name?: string | null
+          project_id?: string | null
+          status?: string
+          updated_date?: string
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          action_category?: string
+          action_key?: string
+          action_label?: string | null
+          admin_note?: string | null
+          balance_after?: number | null
+          balance_before?: number | null
+          created_by_id?: string | null
+          created_date?: string
+          error_message?: string | null
+          gems_deducted?: number | null
+          gems_refunded?: number | null
+          id?: string
+          plan_name?: string | null
+          project_id?: string | null
+          status?: string
+          updated_date?: string
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      GeneratedImage: {
+        Row: {
+          approved: boolean | null
+          aspect_ratio: string | null
+          consistency_mode: boolean | null
+          created_by_id: string | null
+          created_date: string
+          error_message: string | null
+          gems_cost: number | null
+          generation_time_ms: number | null
+          id: string
+          image_url: string | null
+          master_frame: boolean | null
+          project_id: string
+          prompt: string | null
+          provider: string | null
+          quality: string | null
+          scene_number: number
+          sent_to_video: boolean | null
+          status: string | null
+          style_preset: string | null
+          thumbnail_url: string | null
+          updated_date: string
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean | null
+          aspect_ratio?: string | null
+          consistency_mode?: boolean | null
+          created_by_id?: string | null
+          created_date?: string
+          error_message?: string | null
+          gems_cost?: number | null
+          generation_time_ms?: number | null
+          id?: string
+          image_url?: string | null
+          master_frame?: boolean | null
+          project_id: string
+          prompt?: string | null
+          provider?: string | null
+          quality?: string | null
+          scene_number: number
+          sent_to_video?: boolean | null
+          status?: string | null
+          style_preset?: string | null
+          thumbnail_url?: string | null
+          updated_date?: string
+          user_id: string
+        }
+        Update: {
+          approved?: boolean | null
+          aspect_ratio?: string | null
+          consistency_mode?: boolean | null
+          created_by_id?: string | null
+          created_date?: string
+          error_message?: string | null
+          gems_cost?: number | null
+          generation_time_ms?: number | null
+          id?: string
+          image_url?: string | null
+          master_frame?: boolean | null
+          project_id?: string
+          prompt?: string | null
+          provider?: string | null
+          quality?: string | null
+          scene_number?: number
+          sent_to_video?: boolean | null
+          status?: string | null
+          style_preset?: string | null
+          thumbnail_url?: string | null
+          updated_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      GenerationLog: {
+        Row: {
+          created_by_id: string | null
+          created_date: string
+          gems_used: number
+          generation_type: string
+          id: string
+          project_id: string | null
+          project_name: string | null
+          project_type: string | null
+          updated_date: string
+          user_id: string
+        }
+        Insert: {
+          created_by_id?: string | null
+          created_date?: string
+          gems_used: number
+          generation_type?: string
+          id?: string
+          project_id?: string | null
+          project_name?: string | null
+          project_type?: string | null
+          updated_date?: string
+          user_id: string
+        }
+        Update: {
+          created_by_id?: string | null
+          created_date?: string
+          gems_used?: number
+          generation_type?: string
+          id?: string
+          project_id?: string | null
+          project_name?: string | null
+          project_type?: string | null
+          updated_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      Project: {
+        Row: {
+          audience: string | null
+          created_by_id: string | null
+          created_date: string
+          gems_used: number | null
+          generation_type: string | null
+          genre: string | null
+          id: string
+          idea_description: string | null
+          languages: string[] | null
+          master_prompt: string | null
+          mood: string | null
+          narration_guide: string | null
+          project_type: string
+          recommended_tools: Json | null
+          scene_count: number | null
+          sound_prompt: string | null
+          status: string | null
+          style: string | null
+          target_format: string | null
+          thumbnail_concept: string | null
+          title: string
+          tone: string | null
+          updated_date: string
+          visual_prompt: string | null
+          visual_style_key: string | null
+          youtube_description: string | null
+          youtube_package: Json | null
+          youtube_tags: string[] | null
+          youtube_title: string | null
+        }
+        Insert: {
+          audience?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          gems_used?: number | null
+          generation_type?: string | null
+          genre?: string | null
+          id?: string
+          idea_description?: string | null
+          languages?: string[] | null
+          master_prompt?: string | null
+          mood?: string | null
+          narration_guide?: string | null
+          project_type: string
+          recommended_tools?: Json | null
+          scene_count?: number | null
+          sound_prompt?: string | null
+          status?: string | null
+          style?: string | null
+          target_format?: string | null
+          thumbnail_concept?: string | null
+          title: string
+          tone?: string | null
+          updated_date?: string
+          visual_prompt?: string | null
+          visual_style_key?: string | null
+          youtube_description?: string | null
+          youtube_package?: Json | null
+          youtube_tags?: string[] | null
+          youtube_title?: string | null
+        }
+        Update: {
+          audience?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          gems_used?: number | null
+          generation_type?: string | null
+          genre?: string | null
+          id?: string
+          idea_description?: string | null
+          languages?: string[] | null
+          master_prompt?: string | null
+          mood?: string | null
+          narration_guide?: string | null
+          project_type?: string
+          recommended_tools?: Json | null
+          scene_count?: number | null
+          sound_prompt?: string | null
+          status?: string | null
+          style?: string | null
+          target_format?: string | null
+          thumbnail_concept?: string | null
+          title?: string
+          tone?: string | null
+          updated_date?: string
+          visual_prompt?: string | null
+          visual_style_key?: string | null
+          youtube_description?: string | null
+          youtube_package?: Json | null
+          youtube_tags?: string[] | null
+          youtube_title?: string | null
+        }
+        Relationships: []
+      }
+      ProjectCharacter: {
+        Row: {
+          consistency_score: number | null
+          consistency_status: string | null
+          created_by_id: string | null
+          created_date: string
+          description_full: string | null
+          description_short: string | null
+          dna: Json | null
+          gems_used: number | null
+          id: string
+          location_hints: string[] | null
+          lock_type: string | null
+          name: string
+          original_name: string | null
+          project_id: string
+          provider_embedding_id: string | null
+          reference_image_url: string | null
+          role: string | null
+          scenes: number[] | null
+          sort_order: number | null
+          updated_date: string
+          user_id: string
+        }
+        Insert: {
+          consistency_score?: number | null
+          consistency_status?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          description_full?: string | null
+          description_short?: string | null
+          dna?: Json | null
+          gems_used?: number | null
+          id?: string
+          location_hints?: string[] | null
+          lock_type?: string | null
+          name: string
+          original_name?: string | null
+          project_id: string
+          provider_embedding_id?: string | null
+          reference_image_url?: string | null
+          role?: string | null
+          scenes?: number[] | null
+          sort_order?: number | null
+          updated_date?: string
+          user_id: string
+        }
+        Update: {
+          consistency_score?: number | null
+          consistency_status?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          description_full?: string | null
+          description_short?: string | null
+          dna?: Json | null
+          gems_used?: number | null
+          id?: string
+          location_hints?: string[] | null
+          lock_type?: string | null
+          name?: string
+          original_name?: string | null
+          project_id?: string
+          provider_embedding_id?: string | null
+          reference_image_url?: string | null
+          role?: string | null
+          scenes?: number[] | null
+          sort_order?: number | null
+          updated_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      StoryboardDirectorScene: {
+        Row: {
+          approved: boolean | null
+          camera_direction: string | null
+          created_by_id: string | null
+          created_date: string
+          detected_characters: string[] | null
+          detected_location: string | null
+          id: string
+          mood: string | null
+          motion_prompt: string | null
+          pacing: string | null
+          project_id: string
+          scene_duration: number | null
+          scene_number: number
+          sort_order: number | null
+          story_text: string | null
+          transition_type: string | null
+          updated_date: string
+          user_id: string
+          visual_prompt: string | null
+        }
+        Insert: {
+          approved?: boolean | null
+          camera_direction?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          detected_characters?: string[] | null
+          detected_location?: string | null
+          id?: string
+          mood?: string | null
+          motion_prompt?: string | null
+          pacing?: string | null
+          project_id: string
+          scene_duration?: number | null
+          scene_number: number
+          sort_order?: number | null
+          story_text?: string | null
+          transition_type?: string | null
+          updated_date?: string
+          user_id: string
+          visual_prompt?: string | null
+        }
+        Update: {
+          approved?: boolean | null
+          camera_direction?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          detected_characters?: string[] | null
+          detected_location?: string | null
+          id?: string
+          mood?: string | null
+          motion_prompt?: string | null
+          pacing?: string | null
+          project_id?: string
+          scene_duration?: number | null
+          scene_number?: number
+          sort_order?: number | null
+          story_text?: string | null
+          transition_type?: string | null
+          updated_date?: string
+          user_id?: string
+          visual_prompt?: string | null
+        }
+        Relationships: []
+      }
+      StoryboardScene: {
+        Row: {
+          approved: boolean | null
+          approved_at: string | null
+          approved_image_url: string | null
+          approved_prompt: string | null
+          aspect_ratio: string | null
+          created_by_id: string | null
+          created_date: string
+          error_message: string | null
+          gems_used: number | null
+          id: string
+          image_provider: string | null
+          image_url: string | null
+          project_id: string
+          scene_number: number
+          status: string | null
+          updated_date: string
+          user_id: string
+          visual_prompt: string | null
+        }
+        Insert: {
+          approved?: boolean | null
+          approved_at?: string | null
+          approved_image_url?: string | null
+          approved_prompt?: string | null
+          aspect_ratio?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          error_message?: string | null
+          gems_used?: number | null
+          id?: string
+          image_provider?: string | null
+          image_url?: string | null
+          project_id: string
+          scene_number: number
+          status?: string | null
+          updated_date?: string
+          user_id: string
+          visual_prompt?: string | null
+        }
+        Update: {
+          approved?: boolean | null
+          approved_at?: string | null
+          approved_image_url?: string | null
+          approved_prompt?: string | null
+          aspect_ratio?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          error_message?: string | null
+          gems_used?: number | null
+          id?: string
+          image_provider?: string | null
+          image_url?: string | null
+          project_id?: string
+          scene_number?: number
+          status?: string | null
+          updated_date?: string
+          user_id?: string
+          visual_prompt?: string | null
+        }
+        Relationships: []
+      }
+      User: {
+        Row: {
+          billing_issue: boolean | null
+          billing_issue_since: string | null
+          created_by_id: string | null
+          created_date: string
+          email: string
+          full_name: string
+          gems_balance: number | null
+          gems_limit_monthly: number | null
+          gems_reset_date: string | null
+          gems_used_this_month: number | null
+          id: string
+          role: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_cancel_at: string | null
+          subscription_plan: string | null
+          subscription_reset_date: string | null
+          subscription_status: string | null
+          updated_date: string
+        }
+        Insert: {
+          billing_issue?: boolean | null
+          billing_issue_since?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          email: string
+          full_name: string
+          gems_balance?: number | null
+          gems_limit_monthly?: number | null
+          gems_reset_date?: string | null
+          gems_used_this_month?: number | null
+          id?: string
+          role?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_cancel_at?: string | null
+          subscription_plan?: string | null
+          subscription_reset_date?: string | null
+          subscription_status?: string | null
+          updated_date?: string
+        }
+        Update: {
+          billing_issue?: boolean | null
+          billing_issue_since?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          email?: string
+          full_name?: string
+          gems_balance?: number | null
+          gems_limit_monthly?: number | null
+          gems_reset_date?: string | null
+          gems_used_this_month?: number | null
+          id?: string
+          role?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_cancel_at?: string | null
+          subscription_plan?: string | null
+          subscription_reset_date?: string | null
+          subscription_status?: string | null
+          updated_date?: string
+        }
+        Relationships: []
+      }
+      VideoJob: {
+        Row: {
+          anchor_image_url: string | null
+          approved: boolean | null
+          completed_at: string | null
+          created_by_id: string | null
+          created_date: string
+          duration: number | null
+          error_message: string | null
+          first_frame_url: string | null
+          gems_cost: number | null
+          gems_refunded: number | null
+          id: string
+          last_frame_url: string | null
+          motion_prompt: string | null
+          next_scene_first_frame: string | null
+          prev_scene_last_frame: string | null
+          project_id: string
+          provider: string | null
+          provider_data: Json | null
+          resolution: string | null
+          scene_number: number
+          status: string | null
+          transition_directive: string | null
+          updated_date: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          anchor_image_url?: string | null
+          approved?: boolean | null
+          completed_at?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          duration?: number | null
+          error_message?: string | null
+          first_frame_url?: string | null
+          gems_cost?: number | null
+          gems_refunded?: number | null
+          id?: string
+          last_frame_url?: string | null
+          motion_prompt?: string | null
+          next_scene_first_frame?: string | null
+          prev_scene_last_frame?: string | null
+          project_id: string
+          provider?: string | null
+          provider_data?: Json | null
+          resolution?: string | null
+          scene_number: number
+          status?: string | null
+          transition_directive?: string | null
+          updated_date?: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          anchor_image_url?: string | null
+          approved?: boolean | null
+          completed_at?: string | null
+          created_by_id?: string | null
+          created_date?: string
+          duration?: number | null
+          error_message?: string | null
+          first_frame_url?: string | null
+          gems_cost?: number | null
+          gems_refunded?: number | null
+          id?: string
+          last_frame_url?: string | null
+          motion_prompt?: string | null
+          next_scene_first_frame?: string | null
+          prev_scene_last_frame?: string | null
+          project_id?: string
+          provider?: string | null
+          provider_data?: Json | null
+          resolution?: string | null
+          scene_number?: number
+          status?: string | null
+          transition_directive?: string | null
+          updated_date?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      WorldLocation: {
+        Row: {
+          aliases: string[] | null
+          canonical_name: string
+          consistency_score: number | null
+          created_by_id: string | null
+          created_date: string
+          description: string | null
+          dna: Json | null
+          id: string
+          location_type: string | null
+          lock_type: string | null
+          project_id: string
+          reference_image_url: string | null
+          scenes: number[] | null
+          sort_order: number | null
+          updated_date: string
+          user_id: string
+        }
+        Insert: {
+          aliases?: string[] | null
+          canonical_name: string
+          consistency_score?: number | null
+          created_by_id?: string | null
+          created_date?: string
+          description?: string | null
+          dna?: Json | null
+          id?: string
+          location_type?: string | null
+          lock_type?: string | null
+          project_id: string
+          reference_image_url?: string | null
+          scenes?: number[] | null
+          sort_order?: number | null
+          updated_date?: string
+          user_id: string
+        }
+        Update: {
+          aliases?: string[] | null
+          canonical_name?: string
+          consistency_score?: number | null
+          created_by_id?: string | null
+          created_date?: string
+          description?: string | null
+          dna?: Json | null
+          id?: string
+          location_type?: string | null
+          lock_type?: string | null
+          project_id?: string
+          reference_image_url?: string | null
+          scenes?: number[] | null
+          sort_order?: number | null
+          updated_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
