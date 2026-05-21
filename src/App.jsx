@@ -26,6 +26,7 @@ const Roadmap      = lazy(() => import('@/pages/Roadmap'));
 const GemHistory   = lazy(() => import('@/pages/GemHistory'));
 const Storyboard        = lazy(() => import('@/pages/Storyboard'));
 const ProductionStudio  = lazy(() => import('@/pages/ProductionStudio'));
+const Login             = lazy(() => import('@/pages/Login'));
 
 function PageLoader() {
   return (
@@ -81,6 +82,7 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait" initial={false}>
       <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/upgrade" element={<PageTransition><Upgrade /></PageTransition>} />

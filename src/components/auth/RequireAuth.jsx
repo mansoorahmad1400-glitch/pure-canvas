@@ -1,29 +1,19 @@
-import { useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { useEffect, useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 
 export default function RequireAuth({ children }) {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['current-user'],
-    queryFn: async () => {
-      try {
-        return await base44.auth.me();
-      } catch {
-        return null;
-      }
-    },
-    retry: false,
-    staleTime: 0,
-  });
+  const location = useLocation();
+  const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      base44.auth.redirectToLogin();
-    }
-  }, [isLoading, user]);
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
-  if (isLoading) {
+  if (session === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -31,13 +21,9 @@ export default function RequireAuth({ children }) {
     );
   }
 
-  if (!user) {
-    // Show nothing while redirect is in progress
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
-    );
+  if (!session) {
+    const from = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?from_url=${from}`} replace />;
   }
 
   return children;
