@@ -660,6 +660,7 @@ export default function AudioPhase() {
               <SceneAudioCard
                 key={scene.id}
                 scene={scene}
+                projectId={projectId}
                 video={approvedVideoByScene.get(scene.id)}
                 sceneAssets={assetsByScene.get(scene.id) ?? []}
                 onAddAsset={handleAddAsset}
