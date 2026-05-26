@@ -15,6 +15,7 @@ import {
 import { defaultStyleFor } from '@/lib/studio/characterExtractor';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+import AssetUploadButton from '@/components/studio/AssetUploadButton';
 
 // ---------- helpers ----------
 function buildDefaultPrompt({ scene, project, characters }) {
