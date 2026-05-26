@@ -125,7 +125,23 @@ export default function CharactersPhase() {
   const handleExtract = async () => {
     setExtracting(true);
     try {
-      const scenes = scenesQ.data ?? [];
+      // Ensure we have the latest scenes
+      let scenes = scenesQ.data;
+      if (!scenes) {
+        const refetched = await scenesQ.refetch();
+        scenes = refetched.data ?? [];
+      }
+      const approvedScenes = scenes.filter(
+        (s) => s.visual_status === 'approved' && s.audio_status === 'approved'
+      );
+      if (approvedScenes.length === 0) {
+        toast({
+          title: 'No approved scenes yet',
+          description: 'Approve at least one Storyboard scene before extracting characters.',
+          variant: 'destructive',
+        });
+        return;
+      }
       const candidates = extractCharacters({
         scenes,
         projectType: project?.project_type,
@@ -134,9 +150,8 @@ export default function CharactersPhase() {
       if (candidates.length === 0) {
         toast({
           title: 'Nothing new to extract',
-          description: 'Approve more storyboard scenes or add character names there first.',
+          description: 'All detected characters are already in your list.',
         });
-        setExtracting(false);
         return;
       }
       let added = 0;
@@ -145,13 +160,24 @@ export default function CharactersPhase() {
         try {
           await insertCharacter({ project_id: projectId, ...payload });
           added++;
-        } catch { /* skip individual failures */ }
+        } catch (err) {
+          console.error('Character insert failed', err);
+        }
       }
-      toast({ title: `Extracted ${added} character${added === 1 ? '' : 's'}`, description: 'Review and approve them below.' });
+      toast({
+        title: `Extracted ${added} character${added === 1 ? '' : 's'}`,
+        description: 'Review and approve them below.',
+      });
     } catch (e) {
-      toast({ title: 'Extraction failed', description: e.message, variant: 'destructive' });
+      console.error('Extraction error', e);
+      toast({
+        title: 'Extraction failed',
+        description: e?.message || 'Unexpected error. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setExtracting(false);
     }
-    setExtracting(false);
   };
 
   const handleDelete = async (id) => {
