@@ -72,7 +72,7 @@ export function computePhaseStatus({ scenes, characters, images, videos, audio, 
     audio.filter((a) => a.approval_status === 'approved' && a.scene_id).map((a) => a.scene_id)
   );
   const audioDone = [...approvedVideoSceneIds].some((sid) => approvedAudioSceneIds.has(sid));
-  const exportDone = !!(exportRow && exportRow.status === 'completed');
+  const exportDone = !!(exportRow && (exportRow.status === 'completed' || exportRow.status === 'ready_for_render'));
   return {
     storyboard, characters: charactersDone, images: imagesDone,
     animate: animateDone, audio: audioDone, export: exportDone,
