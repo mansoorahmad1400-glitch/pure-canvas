@@ -576,6 +576,69 @@ export type Database = {
         }
         Relationships: []
       }
+      project_assets: {
+        Row: {
+          approval_status: string
+          asset_role: string | null
+          asset_type: string
+          created_at: string
+          duration_seconds: number | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          height: number | null
+          id: string
+          mime_type: string | null
+          project_id: string
+          provider: string
+          public_url: string | null
+          scene_id: string | null
+          updated_at: string
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          approval_status?: string
+          asset_role?: string | null
+          asset_type: string
+          created_at?: string
+          duration_seconds?: number | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          height?: number | null
+          id?: string
+          mime_type?: string | null
+          project_id: string
+          provider?: string
+          public_url?: string | null
+          scene_id?: string | null
+          updated_at?: string
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          approval_status?: string
+          asset_role?: string | null
+          asset_type?: string
+          created_at?: string
+          duration_seconds?: number | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          height?: number | null
+          id?: string
+          mime_type?: string | null
+          project_id?: string
+          provider?: string
+          public_url?: string | null
+          scene_id?: string | null
+          updated_at?: string
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       project_audio_assets: {
         Row: {
           approval_status: string
