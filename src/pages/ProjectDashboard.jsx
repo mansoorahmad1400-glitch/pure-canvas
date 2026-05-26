@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -8,10 +8,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import {
-  projectsApi, scenesApi, charactersApi, sceneImagesApi,
-  sceneVideosApi, audioAssetsApi, exportsApi,
-} from '@/lib/studio/api';
+import { projectsApi } from '@/lib/studio/api';
+import { getProjectPhaseSummary, syncProjectSummary } from '@/lib/studio/phaseStatus';
 import PhaseCard from '@/components/studio/PhaseCard';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
