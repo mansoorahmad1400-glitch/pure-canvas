@@ -28,6 +28,7 @@ const Storyboard        = lazy(() => import('@/pages/Storyboard'));
 const ProductionStudio  = lazy(() => import('@/pages/ProductionStudio'));
 const ProjectDashboard  = lazy(() => import('@/pages/ProjectDashboard'));
 const PhasePlaceholder  = lazy(() => import('@/pages/PhasePlaceholder'));
+const StoryboardPhase   = lazy(() => import('@/pages/StoryboardPhase'));
 const Login             = lazy(() => import('@/pages/Login'));
 
 function PageLoader() {
