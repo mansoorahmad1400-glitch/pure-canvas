@@ -15,8 +15,18 @@ const EDITABLE_FIELDS = [
   'camera_direction', 'image_prompt', 'animation_prompt', 'transition_to_next',
   'audio_mode', 'dialogue_text', 'narration_text', 'rhyme_lyrics',
   'background_music_prompt', 'sfx_prompt', 'voice_style', 'audio_timing',
-  'duration', 'visual_status', 'audio_status',
+  'duration_seconds', 'visual_status', 'audio_status',
 ];
+
+// Map legacy local `duration` to canonical `duration_seconds` before any DB write
+function pickEditableSafe(scene) {
+  const out = {};
+  for (const k of EDITABLE_FIELDS) if (k in scene) out[k] = scene[k];
+  if (out.duration_seconds == null && scene.duration != null) {
+    out.duration_seconds = Number(scene.duration) || 6;
+  }
+  return out;
+}
 
 function pickEditable(scene) {
   const out = {};
@@ -97,7 +107,7 @@ export default function StoryboardPhase() {
       user_id: user.id,
       scene_number: nextNumber,
       scene_title: '',
-      duration: 6,
+      duration_seconds: 6,
       audio_mode: defaultAudioModeFor(projectType),
       visual_status: 'draft',
       audio_status: 'draft',
@@ -141,7 +151,7 @@ export default function StoryboardPhase() {
     await Promise.all(
       after.map((s) => scenesApi.update(s.id, { scene_number: s.scene_number + 1 }))
     );
-    const cloneBody = pickEditable(src);
+    const cloneBody = pickEditableSafe(src);
     const { data, error } = await supabase
       .from('storyboard_scenes')
       .insert({
@@ -213,7 +223,7 @@ export default function StoryboardPhase() {
       ids.map((id) => {
         const s = scenes.find((x) => x.id === id);
         if (!s) return Promise.resolve({ id, ok: true });
-        return scenesApi.update(id, pickEditable(s)).then((r) => ({ id, ok: !r.error, err: r.error }));
+        return scenesApi.update(id, pickEditableSafe(s)).then((r) => ({ id, ok: !r.error, err: r.error }));
       })
     );
     setSavingAll(false);

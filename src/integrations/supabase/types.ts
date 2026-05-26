@@ -866,6 +866,7 @@ export type Database = {
           characters: string[] | null
           created_at: string
           dialogue_text: string | null
+          duration_seconds: number
           environment_description: string | null
           id: string
           image_prompt: string | null
@@ -892,6 +893,7 @@ export type Database = {
           characters?: string[] | null
           created_at?: string
           dialogue_text?: string | null
+          duration_seconds?: number
           environment_description?: string | null
           id?: string
           image_prompt?: string | null
@@ -918,6 +920,7 @@ export type Database = {
           characters?: string[] | null
           created_at?: string
           dialogue_text?: string | null
+          duration_seconds?: number
           environment_description?: string | null
           id?: string
           image_prompt?: string | null

@@ -74,8 +74,8 @@ export default function SceneEditorCard({
             type="number"
             min={1}
             step={1}
-            value={scene.duration ?? 6}
-            onChange={(e) => onChange({ duration: Number(e.target.value) || 6 })}
+            value={scene.duration_seconds ?? scene.duration ?? 6}
+            onChange={(e) => onChange({ duration_seconds: Number(e.target.value) || 6 })}
             className="h-7 w-14 text-xs text-center"
           />
         </div>

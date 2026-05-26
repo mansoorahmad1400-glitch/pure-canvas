@@ -1,0 +1,1 @@
+ALTER TABLE public.storyboard_scenes ADD COLUMN IF NOT EXISTS duration_seconds integer NOT NULL DEFAULT 6;
