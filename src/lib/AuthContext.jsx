@@ -1,62 +1,48 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/integrations/supabase/client';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoadingPublicSettings] = useState(false);
-  const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
-    checkAuth();
+    // Subscribe FIRST, then hydrate
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      setIsLoadingAuth(false);
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setIsLoadingAuth(false);
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
-  const checkAuth = async () => {
-    setIsLoadingAuth(true);
-    setAuthError(null);
-    try {
-      const authenticated = await base44.auth.isAuthenticated();
-      if (authenticated) {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      const status = error?.status || error?.response?.status;
-      if (status === 403 && error?.data?.extra_data?.reason === 'user_not_registered') {
-        setAuthError({ type: 'user_not_registered' });
-      } else {
-        setUser(null);
-      }
-    } finally {
-      setIsLoadingAuth(false);
-    }
-  };
+  const user = session?.user ?? null;
 
-  const logout = () => {
-    setUser(null);
-    base44.auth.logout();
+  const logout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/login';
   };
 
   const navigateToLogin = () => {
-    base44.auth.redirectToLogin();
+    window.location.href = '/login';
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      isAuthenticated: !!user,
+      session,
+      isAuthenticated: !!session,
       isLoadingAuth,
-      isLoadingPublicSettings,
-      authError,
+      isLoadingPublicSettings: false,
+      authError: null,
       appPublicSettings: null,
       logout,
       navigateToLogin,
-      checkAppState: checkAuth
+      checkAppState: () => {},
     }}>
       {children}
     </AuthContext.Provider>
@@ -65,8 +51,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
