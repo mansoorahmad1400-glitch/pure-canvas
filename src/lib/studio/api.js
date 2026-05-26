@@ -182,6 +182,45 @@ export const exportsApi = {
   },
   update: (id, patch) =>
     supabase.from('final_exports').update(patch).eq('id', id).select().single(),
+  /**
+   * Upsert a single export row per project. Stores the full manifest snapshot.
+   */
+  saveManifest: async ({ project_id, manifest, status, validation_notes, approved_scene_ids }) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+    const existing = await supabase
+      .from('final_exports')
+      .select('id')
+      .eq('project_id', project_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const payload = {
+      project_id,
+      user_id: user.id,
+      export_manifest: manifest,
+      approved_scene_ids: approved_scene_ids ?? [],
+      validation_notes: validation_notes ?? null,
+      status: status ?? 'queued',
+      final_video_url: null,
+    };
+    if (existing.data?.id) {
+      return supabase
+        .from('final_exports')
+        .update(payload)
+        .eq('id', existing.data.id)
+        .select()
+        .single();
+    }
+    return supabase.from('final_exports').insert(payload).select().single();
+  },
+  markReadyForRender: (id) =>
+    supabase
+      .from('final_exports')
+      .update({ status: 'ready_for_render' })
+      .eq('id', id)
+      .select()
+      .single(),
 };
 
 // ---------- gating helpers ----------

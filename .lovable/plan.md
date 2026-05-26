@@ -1,47 +1,82 @@
-## Step 7 — Animate Phase UI
+## Step 9 — Final Export Phase (safe, no real MP4)
 
-Build a real Animate workspace mirroring the Images phase pattern, gated on approved images, with mock/manual video support and a true completion rule. No external APIs.
+Goal: ship a working Export page that collects approved scenes, shows a validated timeline preview, and saves a manifest — with zero fake renders and no paid APIs.
 
-### 1. Database migration (`scene_videos`)
-Add nullable fields needed by the new UI (existing `duration` numeric kept for compatibility):
-- `image_id uuid` — links the source approved scene image
-- `prompt_used text` — animation prompt
-- `duration_seconds integer default 6` — canonical duration field going forward
-- `notes text` — free-form notes (parity with `scene_images`)
+### 1. Database migration (additive only)
+Add safe fields to existing `final_exports` table:
+- `export_manifest jsonb` — full timeline snapshot
+- `validation_notes text` — already exists, keep
+- `approved_scene_ids uuid[]` — already exists, keep
+- `preview_video_url text` nullable — already exists
+- `final_video_url text` nullable — already exists, never populate in this step
+- `status text` — extend allowed values to include `ready_for_render`
 
-RLS already correct; no policy changes.
+No drops, no renames. Existing rows preserved.
 
-### 2. API helpers (`src/lib/studio/api.js`)
-Extend `sceneVideosApi` with `update`, `unapprove`, `remove`, and make `approve`/`create` return single records (parity with `sceneImagesApi`).
+### 2. API layer — `src/lib/studio/api.js`
+Add `finalExportsApi`:
+- `getByProject(projectId)` — return latest manifest row
+- `saveManifest(projectId, manifest, status, validationNotes, approvedSceneIds)` — upsert one row per project
+- `markReadyForRender(projectId)` — sets `status = 'ready_for_render'`
 
-### 3. Routing (`src/App.jsx`)
-Register a new lazy route `/project/:id/animate` → `AnimatePhase`, placed before the `:phase` placeholder fallback so the "coming soon / Mark Complete" placeholder no longer renders for Animate.
+### 3. New page — `src/pages/ExportPhase.jsx`
+Route registered in `App.jsx` at `/project/:id/export` BEFORE the catch-all phase placeholder, lazy-loaded like the other phases.
 
-### 4. New page `src/pages/AnimatePhase.jsx`
-Structure mirrors `ImagesPhase.jsx`:
+Page sections:
+1. **Header** — project title, "Final Export" heading, helper text, Back to Dashboard, Refresh Approved Assets, Save Export Manifest, Ready for Render.
+2. **Readiness banner** — Ready / Not Ready, counts (included / excluded).
+3. **Included Timeline** — list of qualifying scenes with scene number, title, duration, video preview (or mock placeholder), audio summary chip (voice/music/SFX/mix/rhyme/silent), Ready badge.
+4. **Excluded Scenes** — collapsible, each with explicit reason: no approved video / no approved audio / storyboard not approved / image not approved / deleted-invalid.
+5. **Preview Player** — sequential per-scene playback of approved videos with the chosen audio asset; clearly labeled "Preview only — not a final MP4 render." No MediaRecorder, no canvas export.
+6. **Future renderer note** — small info block explaining backend MP4 renderer comes later.
 
-- **Header**: project title, "Animate" heading, helper text, Back to Dashboard, Refresh, Save All.
-- **Gating**: list only scenes that have an approved record in `scene_images` (join in memory via `scene_id`). If none → empty state "No approved images yet…" + "Back to Images" button.
-- **Per-scene card** (`SceneVideoCard`):
-  - Left: approved image preview, scene #, title, `duration_seconds`, transition + camera chips, status badge (Missing/Draft/Approved).
-  - Right: editable Animation Prompt (textarea), buttons: Edit/Save Prompt, Add Video URL, Use Mock Video Placeholder, Approve, Unapprove, Delete.
-- **buildDefaultAnimationPrompt()** combines, in order:
-  `scene.animation_prompt`, `scene.camera_direction`, `scene.transition_to_next`, `scene.story_text`, `scene.environment_description`, approved image `prompt_used`, `project.style`, `duration_seconds`.
-  For project_type in {story, fairy_tale, fantasy, kids, cartoon}, append a cartoon/cinematic family-friendly suffix instead of realistic defaults (reuses/extends `defaultStyleFor` from `characterExtractor`).
-- **Mock placeholder**: store `video_url = 'https://placehold.co/1280x720/0f172a/e2e8f0?text=Scene+Video'`, `provider = 'mock'`. No video element required — show a styled placeholder card with the image as poster and a "Mock video" label.
-- **Manual URL**: store as-is, `provider = 'manual'`. Render `<video>` if URL ends in mp4/webm/mov, otherwise show link + poster image.
-- **Save All**: initialize draft `scene_videos` rows for every approved image without an existing video record (uses default prompt). Shows "Saving / Saved X / No unsaved changes" feedback like Images.
-- **Approval rule** (client-side guard + disabled buttons):
-  approve only when scene exists, approved image exists, `(video_url || provider === 'mock')`, and `prompt_used` non-empty. Otherwise the Approve button is disabled with a tooltip explaining why.
-- **Stability**: `useAuthReady` gating, `QueryErrorState` with retry, try/catch/finally around every async action, dismissible toasts via existing toaster.
+### 4. Inclusion rules (computed client-side)
+A scene is included only when ALL are true:
+- `storyboard_scenes` row exists, not soft-deleted
+- has at least one approved `scene_images` row (approval_status = 'approved')
+- has at least one approved `scene_videos` row
+- has at least one approved `project_audio_assets` row OR `storyboard_scenes.audio_mode = 'silent'` with audio approved-silent marker
 
-### 5. Completion rule
-The Animate page does **not** render `PhaseWorkspace`'s placeholder footer. Instead it shows its own status strip:
-- "0 approved videos — approve at least one to continue" (Mark Complete + Next disabled).
-- "N approved videos ready for Audio" — enables a single `Continue to Audio →` button that navigates to `/project/:id/audio`. No "Mark Complete" needed; `computePhaseStatus` in `ProjectDashboard` already derives `animate` completion from approved videos, so the dashboard reflects state automatically.
+Excluded scenes are listed with the first failing reason.
 
-### 6. Preserved / untouched
-Auth, dev access, project creation, dashboard, storyboard, characters, images page logic (read-only here), audio, export, billing, providers, secrets — all left as-is. No location phase. `PhasePlaceholder` still serves audio/export until their steps.
+### 5. Manifest shape (saved to `final_exports.export_manifest`)
+```
+{
+  project_id,
+  generated_at,
+  scenes: [
+    { scene_id, scene_number, duration_seconds, video_url,
+      audio_asset_ids: [...], audio_url, audio_mode }
+  ],
+  excluded: [ { scene_id, scene_number, reason } ],
+  status: "ready_for_render" | "not_ready",
+  validation_notes
+}
+```
 
-### Acceptance check
-After implementation: open `/project/:id/animate` → see real workspace, no "coming soon"; only scenes with approved images appear; can edit prompt, add URL, add mock, approve/unapprove/delete; rows persist in `scene_videos` and survive refresh; Continue to Audio only enabled after ≥1 approved video; dashboard's Animate card flips to complete based on Supabase data; no API/billing calls.
+### 6. Buttons / actions
+- **Save Export Manifest** — writes/updates the row; toast confirmation.
+- **Ready for Render** — only enabled when ≥1 included scene; sets status `ready_for_render`.
+- **(No) Generate MP4** — replaced by an informational block. If user clicks Ready before any approved scenes exist, show friendly message; never disable the page.
+
+### 7. Dashboard integration
+`ProjectDashboard.jsx` — update `computePhaseStatus` for the Export phase:
+- `ready_for_render` ⇒ phase shows "Ready for Render" (not complete)
+- `final_video_url` populated ⇒ complete (deferred to future renderer step)
+
+### 8. Stability
+- React Query for loads with `loading / empty / error / retry` states
+- All async wrapped in try/catch/finally so loading always clears
+- No external API calls, no secrets, no gems/paywall logic
+
+### Files
+- `supabase/migrations/<ts>_final_exports_manifest.sql` — add `export_manifest jsonb`
+- `src/lib/studio/api.js` — add `finalExportsApi`
+- `src/pages/ExportPhase.jsx` — new page
+- `src/App.jsx` — register `/project/:id/export` route
+- `src/pages/ProjectDashboard.jsx` — recognize `ready_for_render` status
+
+### Out of scope (explicit)
+- No FFmpeg, no cloud render, no MediaRecorder, no canvas export
+- No real MP4 produced, no `final_video_url` written
+- No changes to auth, admin, Storyboard, Characters, Images, Animate, Audio logic, or preview/resume fixes
