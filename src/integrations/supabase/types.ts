@@ -812,8 +812,12 @@ export type Database = {
           approval_status: string
           created_at: string
           duration: number | null
+          duration_seconds: number
           id: string
+          image_id: string | null
+          notes: string | null
           project_id: string
+          prompt_used: string | null
           provider: string | null
           scene_id: string
           updated_at: string
@@ -824,8 +828,12 @@ export type Database = {
           approval_status?: string
           created_at?: string
           duration?: number | null
+          duration_seconds?: number
           id?: string
+          image_id?: string | null
+          notes?: string | null
           project_id: string
+          prompt_used?: string | null
           provider?: string | null
           scene_id: string
           updated_at?: string
@@ -836,8 +844,12 @@ export type Database = {
           approval_status?: string
           created_at?: string
           duration?: number | null
+          duration_seconds?: number
           id?: string
+          image_id?: string | null
+          notes?: string | null
           project_id?: string
+          prompt_used?: string | null
           provider?: string | null
           scene_id?: string
           updated_at?: string

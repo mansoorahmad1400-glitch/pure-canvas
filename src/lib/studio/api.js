@@ -108,8 +108,12 @@ export const sceneVideosApi = {
       .select()
       .single();
   },
+  update: (id, patch) =>
+    supabase.from('scene_videos').update(patch).eq('id', id).select().single(),
   approve: (id) =>
-    supabase.from('scene_videos').update({ approval_status: 'approved' }).eq('id', id),
+    supabase.from('scene_videos').update({ approval_status: 'approved' }).eq('id', id).select().single(),
+  unapprove: (id) =>
+    supabase.from('scene_videos').update({ approval_status: 'pending' }).eq('id', id).select().single(),
   remove: (id) => supabase.from('scene_videos').delete().eq('id', id),
 };
 
