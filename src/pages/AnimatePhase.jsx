@@ -140,6 +140,11 @@ function SceneVideoCard({
   };
 
   const addMock = async () => {
+    if (!confirm(
+      `Generate a mock video placeholder for Scene ${scene.scene_number}?\n\n` +
+      `This attaches a single placeholder to this scene only. ` +
+      `No external API is called and no other scene is affected.`
+    )) return;
     setBusy('mock');
     try {
       await onSaveRecord({
@@ -449,6 +454,11 @@ export default function AnimatePhase() {
       toast({ title: 'Nothing to save', description: 'Each approved scene already has a video record.' });
       return;
     }
+    if (!confirm(
+      `Initialize ${missing.length} empty draft video record${missing.length === 1 ? '' : 's'}?\n\n` +
+      `This only creates blank rows you can fill in manually. ` +
+      `No video is generated and no external API is called.`
+    )) return;
     setSavingAll(true);
     let ok = 0, fail = 0;
     try {
