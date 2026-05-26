@@ -35,13 +35,14 @@ export default function AppLayout() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     queryClient.clear();
-    base44.auth.logout();
+    try { await supabase.auth.signOut(); } catch {}
+    window.location.href = '/login';
   };
 
   const handleLogin = () => {
-    base44.auth.redirectToLogin();
+    window.location.href = '/login';
   };
 
   const bottomTabs = [
