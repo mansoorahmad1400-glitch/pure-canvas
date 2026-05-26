@@ -91,7 +91,8 @@ function AnimatedRoutes() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/upgrade" element={<PageTransition><Upgrade /></PageTransition>} />
-          <Route path="/studio" element={<PageTransition><RequireAuth><Dashboard /></RequireAuth></PageTransition>} />
+          <Route path="/studio" element={<Navigate to="/projects" replace />} />
+          <Route path="/studio/legacy" element={<PageTransition><RequireAuth><Dashboard /></RequireAuth></PageTransition>} />
           <Route path="/projects" element={<PageTransition><RequireAuth><Projects /></RequireAuth></PageTransition>} />
           <Route path="/projects/new" element={<PageTransition><RequireAuth><NewProjectV2 /></RequireAuth></PageTransition>} />
           <Route path="/project/:id" element={<PageTransition><RequireAuth><ProjectDashboard /></RequireAuth></PageTransition>} />

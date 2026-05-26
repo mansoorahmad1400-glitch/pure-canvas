@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Plus, Save, Loader2, Clapperboard } from 'lucide-react';
+import { ArrowLeft, Plus, Save, Loader2, Clapperboard, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { projectsApi, scenesApi } from '@/lib/studio/api';
 import { supabase } from '@/integrations/supabase/client';
+import { SAMPLE_SCENES } from '@/lib/studio/sampleScenes';
 import SceneEditorCard, { canApprove } from '@/components/storyboard/SceneEditorCard';
 
 // Editable fields we persist for each scene
@@ -264,7 +265,34 @@ export default function StoryboardPhase() {
         >
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            size="sm" variant="outline"
+            onClick={async () => {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (!user) return;
+              const startNum = scenes.length
+                ? Math.max(...scenes.map((s) => s.scene_number)) + 1
+                : 1;
+              const rows = SAMPLE_SCENES.map((s, i) => ({
+                ...s,
+                project_id: projectId,
+                user_id: user.id,
+                scene_number: startNum + i,
+              }));
+              const { data, error } = await supabase
+                .from('storyboard_scenes').insert(rows).select();
+              if (error) {
+                toast({ title: 'Could not add samples', description: error.message, variant: 'destructive' });
+              } else {
+                setScenes((prev) => [...prev, ...(data ?? [])]);
+                toast({ title: `Added ${data?.length ?? 0} sample scenes` });
+              }
+            }}
+            className="gap-1.5"
+          >
+            <Wand2 className="w-4 h-4" /> Add Sample Scenes
+          </Button>
           <Button size="sm" variant="outline" onClick={addScene} className="gap-1.5">
             <Plus className="w-4 h-4" /> Add Scene
           </Button>
