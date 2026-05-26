@@ -90,7 +90,7 @@ function VideoPreview({ url, posterUrl, provider }) {
 }
 
 function SceneVideoCard({
-  scene, image, record, project,
+  scene, image, record, project, projectId,
   onSaveRecord, onApprove, onUnapprove, onDelete,
 }) {
   const [prompt, setPrompt] = useState(
