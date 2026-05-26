@@ -5,7 +5,7 @@ import { ArrowLeft, RefreshCw, Save, Send, CheckCircle2, AlertTriangle, ChevronD
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/use-toast';
 import {
   projectsApi,
   scenesApi,
