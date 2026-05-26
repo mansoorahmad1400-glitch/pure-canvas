@@ -14,11 +14,22 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { projectsApi } from '@/lib/studio/api';
+import { getProjectPhaseSummary, syncProjectSummary } from '@/lib/studio/phaseStatus';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+
+const PHASE_LABELS = {
+  storyboard: 'Storyboard',
+  characters: 'Characters',
+  images: 'Images',
+  animate: 'Animate',
+  audio: 'Audio',
+  export: 'Export',
+  complete: 'Complete',
+};
 
 const statusConfig = {
   draft:      { icon: Clock,        label: 'Draft',      cls: 'bg-muted text-muted-foreground' },
