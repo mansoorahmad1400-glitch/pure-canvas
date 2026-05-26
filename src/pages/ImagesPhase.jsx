@@ -593,6 +593,7 @@ export default function ImagesPhase() {
               scene={s}
               record={recordByScene.get(s.id) || null}
               project={project}
+              projectId={projectId}
               characters={characters}
               onSaveRecord={upsertRecord}
               onApprove={approve}
