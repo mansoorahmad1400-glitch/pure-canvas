@@ -15,6 +15,7 @@ import {
 import { defaultStyleFor } from '@/lib/studio/characterExtractor';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+import AssetUploadButton from '@/components/studio/AssetUploadButton';
 
 // ---------- helpers ----------
 function buildDefaultPrompt({ scene, project, characters }) {
@@ -75,7 +76,7 @@ function statusBadge(record) {
 
 // ---------- per-scene card ----------
 function SceneImageCard({
-  scene, record, project, characters,
+  scene, record, project, characters, projectId,
   onSaveRecord, onApprove, onUnapprove, onDelete,
 }) {
   const [prompt, setPrompt] = useState(
@@ -282,6 +283,23 @@ function SceneImageCard({
                 </Button>
               </div>
             )}
+
+            <AssetUploadButton
+              projectId={projectId}
+              kind="image"
+              sceneId={scene.id}
+              assetRole="scene_image"
+              label="Upload Image"
+              onUploaded={async ({ publicUrl }) => {
+                await onSaveRecord({
+                  scene_id: scene.id,
+                  prompt_used: prompt,
+                  image_url: publicUrl,
+                  provider: 'manual_upload',
+                });
+                setImageUrl(publicUrl);
+              }}
+            />
 
             <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs"
               disabled={busy === 'mock'} onClick={addMock}>
@@ -575,6 +593,7 @@ export default function ImagesPhase() {
               scene={s}
               record={recordByScene.get(s.id) || null}
               project={project}
+              projectId={projectId}
               characters={characters}
               onSaveRecord={upsertRecord}
               onApprove={approve}

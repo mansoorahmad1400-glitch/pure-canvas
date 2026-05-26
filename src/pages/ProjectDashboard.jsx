@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Clapperboard, Users, ImageIcon, Video, Music, Package,
-  Loader2, ArrowRight
+  Loader2, ArrowRight, FolderOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -129,9 +129,12 @@ export default function ProjectDashboard() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* Top bar */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <Button asChild variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground">
           <Link to="/projects"><ArrowLeft className="w-4 h-4" /> Back to Projects</Link>
+        </Button>
+        <Button asChild variant="outline" size="sm" className="gap-1.5">
+          <Link to={`/project/${id}/assets`}><FolderOpen className="w-4 h-4" /> Asset Library</Link>
         </Button>
       </div>
 

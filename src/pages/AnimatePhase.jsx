@@ -15,6 +15,7 @@ import {
 import { defaultStyleFor } from '@/lib/studio/characterExtractor';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+import AssetUploadButton from '@/components/studio/AssetUploadButton';
 
 const MOCK_VIDEO_URL =
   'https://placehold.co/1280x720/0f172a/e2e8f0?text=Scene+Video+(Mock)';
@@ -89,7 +90,7 @@ function VideoPreview({ url, posterUrl, provider }) {
 }
 
 function SceneVideoCard({
-  scene, image, record, project,
+  scene, image, record, project, projectId,
   onSaveRecord, onApprove, onUnapprove, onDelete,
 }) {
   const [prompt, setPrompt] = useState(
@@ -260,6 +261,24 @@ function SceneVideoCard({
                 </Button>
               </div>
             )}
+
+            <AssetUploadButton
+              projectId={projectId}
+              kind="video"
+              sceneId={scene.id}
+              assetRole="scene_video"
+              label="Upload Video"
+              onUploaded={async ({ publicUrl }) => {
+                await onSaveRecord({
+                  scene_id: scene.id,
+                  image_id: image.id,
+                  prompt_used: prompt,
+                  video_url: publicUrl,
+                  provider: 'manual_upload',
+                  duration_seconds: scene.duration_seconds ?? 6,
+                });
+              }}
+            />
 
             <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" disabled={busy === 'mock'} onClick={addMock}>
               {busy === 'mock' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
@@ -563,6 +582,7 @@ export default function AnimatePhase() {
                 image={approvedImageByScene.get(scene.id)}
                 record={videoByScene.get(scene.id)}
                 project={project}
+                projectId={projectId}
                 onSaveRecord={upsertRecord}
                 onApprove={approve}
                 onUnapprove={unapprove}

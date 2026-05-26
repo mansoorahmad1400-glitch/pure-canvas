@@ -53,6 +53,7 @@ const ImagesPhase       = lazyWithRetry(() => import('@/pages/ImagesPhase'));
 const AnimatePhase      = lazyWithRetry(() => import('@/pages/AnimatePhase'));
 const AudioPhase        = lazyWithRetry(() => import('@/pages/AudioPhase'));
 const ExportPhase       = lazyWithRetry(() => import('@/pages/ExportPhase'));
+const ProjectAssets     = lazyWithRetry(() => import('@/pages/ProjectAssets'));
 const NewProjectV2      = lazyWithRetry(() => import('@/pages/NewProjectV2'));
 const Login             = lazyWithRetry(() => import('@/pages/Login'));
 
@@ -130,6 +131,7 @@ function AnimatedRoutes() {
           <Route path="/project/:id/animate" element={<PageTransition><RequireAuth><AnimatePhase /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/audio" element={<PageTransition><RequireAuth><AudioPhase /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/export" element={<PageTransition><RequireAuth><ExportPhase /></RequireAuth></PageTransition>} />
+          <Route path="/project/:id/assets" element={<PageTransition><RequireAuth><ProjectAssets /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/:phase" element={<PageTransition><RequireAuth><PhasePlaceholder /></RequireAuth></PageTransition>} />
           <Route path="/account" element={<PageTransition><RequireAuth><Account /></RequireAuth></PageTransition>} />
           <Route path="/admin" element={<PageTransition><RequireAuth><Admin /></RequireAuth></PageTransition>} />

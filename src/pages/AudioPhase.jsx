@@ -13,6 +13,7 @@ import {
 } from '@/lib/studio/api';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+import AssetUploadButton from '@/components/studio/AssetUploadButton';
 
 // Mock placeholder audio URL — short open-source bell tone, useful for testing
 // pipeline gating without calling paid TTS/music providers.
@@ -143,7 +144,7 @@ function AssetRow({ asset, onApprove, onUnapprove, onDelete, onReplace }) {
   );
 }
 
-function SceneAudioCard({ scene, video, sceneAssets, onAddAsset, onApprove, onUnapprove, onDelete, onReplace, onMarkSilent }) {
+function SceneAudioCard({ scene, video, sceneAssets, projectId, onAddAsset, onApprove, onUnapprove, onDelete, onReplace, onMarkSilent }) {
   const [busy, setBusy] = useState(null);
   const [urlMode, setUrlMode] = useState(null); // 'voice' | 'music' | 'sfx' | 'rhyme_song'
   const [urlInput, setUrlInput] = useState('');
@@ -309,6 +310,23 @@ function SceneAudioCard({ scene, video, sceneAssets, onAddAsset, onApprove, onUn
                         Mock
                       </Button>
                     </div>
+                    <AssetUploadButton
+                      projectId={projectId}
+                      kind="audio"
+                      sceneId={scene.id}
+                      assetRole={type}
+                      label={`Upload ${type === 'rhyme_song' ? 'Song' : type}`}
+                      className="h-7 gap-1 text-[11px] w-full"
+                      onUploaded={({ publicUrl, asset }) => onAddAsset({
+                        scene_id: scene.id,
+                        asset_type: type,
+                        provider: 'manual_upload',
+                        audio_url: publicUrl,
+                        prompt_used: promptFor(type),
+                        duration: asset?.duration_seconds ?? scene.duration_seconds ?? 6,
+                        approval_status: 'draft',
+                      })}
+                    />
                     {urlMode === type && (
                       <div className="flex gap-1">
                         <Input value={urlInput} onChange={(e) => setUrlInput(e.target.value)}
@@ -642,6 +660,7 @@ export default function AudioPhase() {
               <SceneAudioCard
                 key={scene.id}
                 scene={scene}
+                projectId={projectId}
                 video={approvedVideoByScene.get(scene.id)}
                 sceneAssets={assetsByScene.get(scene.id) ?? []}
                 onAddAsset={handleAddAsset}
