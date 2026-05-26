@@ -10,7 +10,7 @@ const STOPWORDS = new Set([
   'Scene','Chapter','Mr','Mrs','Ms','Dr','Sir','Lady','King','Queen','Prince',
   'Princess','Lord','Master','Captain','Doctor','Professor','Day','Night',
   'Morning','Evening','Camera','Wide','Close','Shot','Angle','Cut','Fade',
-];
+]);
 
 function extractFromText(text, counter) {
   if (!text) return;
