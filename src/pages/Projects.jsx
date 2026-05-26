@@ -167,9 +167,6 @@ export default function Projects() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
             <FolderOpen className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">No projects yet</h3>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
-            <FolderOpen className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No projects yet</h3>
             <p className="text-muted-foreground mb-6">
               No projects yet. Create your first StudioOne AI project.
             </p>
