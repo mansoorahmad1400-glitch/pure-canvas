@@ -13,6 +13,7 @@ import {
 } from '@/lib/studio/api';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+import AssetUploadButton from '@/components/studio/AssetUploadButton';
 
 // Mock placeholder audio URL — short open-source bell tone, useful for testing
 // pipeline gating without calling paid TTS/music providers.
