@@ -47,35 +47,8 @@ export const PHASES = [
   },
 ];
 
-function isSceneVisualReady(s) {
-  return !!(s.story_text || s.visual_prompt || s.environment || s.characters_in_scene);
-}
-function isSceneAudioReady(s) {
-  return !!(s.dialogue || s.narration || s.lyrics || s.music_prompt || s.sfx_prompt);
-}
-
-export function computePhaseStatus({ scenes, characters, images, videos, audio, exportRow }) {
-  const storyboard = scenes.some((s) => isSceneVisualReady(s) && isSceneAudioReady(s));
-  const charactersDone =
-    characters.length > 0 && characters.every((c) => c.approval_status === 'approved');
-  const imagesDone = images.some((i) => i.approval_status === 'approved');
-  const animateDone = videos.some((v) => v.approval_status === 'approved');
-  // Audio phase complete = at least one scene has both an approved video AND
-  // an approved audio asset (or is approved as silent, which is stored as an
-  // approved asset with provider='silent').
-  const approvedVideoSceneIds = new Set(
-    videos.filter((v) => v.approval_status === 'approved' && v.video_url).map((v) => v.scene_id)
-  );
-  const approvedAudioSceneIds = new Set(
-    audio.filter((a) => a.approval_status === 'approved' && a.scene_id).map((a) => a.scene_id)
-  );
-  const audioDone = [...approvedVideoSceneIds].some((sid) => approvedAudioSceneIds.has(sid));
-  const exportDone = !!(exportRow && (exportRow.status === 'completed' || exportRow.status === 'ready_for_render'));
-  return {
-    storyboard, characters: charactersDone, images: imagesDone,
-    animate: animateDone, audio: audioDone, export: exportDone,
-  };
-}
+// Re-export the central computer so existing imports keep working.
+export { computePhaseStatus } from '@/lib/studio/phaseStatus';
 
 export default function ProjectDashboard() {
   const { id } = useParams();
