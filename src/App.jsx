@@ -64,16 +64,18 @@ function PageLoader() {
   );
 }
 
-// Slide-in transition wrapper for each page
+// Lightweight per-page fade. No exit animation and no AnimatePresence wait
+// mode — those caused first-load blank content where the new page mounted
+// at opacity:0 and never animated in until a manual refresh.
 function PageTransition({ children }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
+      style={{ minHeight: '60vh' }}
     >
-      {children}
+      <Suspense fallback={<PageLoader />}>{children}</Suspense>
     </motion.div>
   );
 }
@@ -108,9 +110,8 @@ class AuthErrorBoundary extends React.Component {
 function AnimatedRoutes() {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <RouteErrorBoundary resetKey={location.pathname}>
-      <Routes location={location} key={location.pathname}>
+    <RouteErrorBoundary resetKey={location.pathname}>
+      <Routes location={location}>
         <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<PageTransition><RootRedirect /></PageTransition>} />
@@ -143,8 +144,7 @@ function AnimatedRoutes() {
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-      </RouteErrorBoundary>
-    </AnimatePresence>
+    </RouteErrorBoundary>
   );
 }
 
