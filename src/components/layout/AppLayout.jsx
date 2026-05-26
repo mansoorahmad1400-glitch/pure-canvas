@@ -46,7 +46,7 @@ export default function AppLayout() {
   };
 
   const bottomTabs = [
-    { path: '/', label: 'Home', icon: Home },
+    { path: '/home', label: 'Home', icon: Home },
     { path: '/studio', label: 'Studio', icon: Sparkles, requireAuth: true },
     { path: '/projects', label: 'Projects', icon: FolderOpen, requireAuth: true },
     { path: '/account', label: 'Account', icon: User, requireAuth: true },
