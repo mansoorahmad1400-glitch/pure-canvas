@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -8,10 +8,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import {
-  projectsApi, scenesApi, charactersApi, sceneImagesApi,
-  sceneVideosApi, audioAssetsApi, exportsApi,
-} from '@/lib/studio/api';
+import { projectsApi } from '@/lib/studio/api';
+import { getProjectPhaseSummary, syncProjectSummary } from '@/lib/studio/phaseStatus';
 import PhaseCard from '@/components/studio/PhaseCard';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
@@ -49,35 +47,8 @@ export const PHASES = [
   },
 ];
 
-function isSceneVisualReady(s) {
-  return !!(s.story_text || s.visual_prompt || s.environment || s.characters_in_scene);
-}
-function isSceneAudioReady(s) {
-  return !!(s.dialogue || s.narration || s.lyrics || s.music_prompt || s.sfx_prompt);
-}
-
-export function computePhaseStatus({ scenes, characters, images, videos, audio, exportRow }) {
-  const storyboard = scenes.some((s) => isSceneVisualReady(s) && isSceneAudioReady(s));
-  const charactersDone =
-    characters.length > 0 && characters.every((c) => c.approval_status === 'approved');
-  const imagesDone = images.some((i) => i.approval_status === 'approved');
-  const animateDone = videos.some((v) => v.approval_status === 'approved');
-  // Audio phase complete = at least one scene has both an approved video AND
-  // an approved audio asset (or is approved as silent, which is stored as an
-  // approved asset with provider='silent').
-  const approvedVideoSceneIds = new Set(
-    videos.filter((v) => v.approval_status === 'approved' && v.video_url).map((v) => v.scene_id)
-  );
-  const approvedAudioSceneIds = new Set(
-    audio.filter((a) => a.approval_status === 'approved' && a.scene_id).map((a) => a.scene_id)
-  );
-  const audioDone = [...approvedVideoSceneIds].some((sid) => approvedAudioSceneIds.has(sid));
-  const exportDone = !!(exportRow && (exportRow.status === 'completed' || exportRow.status === 'ready_for_render'));
-  return {
-    storyboard, characters: charactersDone, images: imagesDone,
-    animate: animateDone, audio: audioDone, export: exportDone,
-  };
-}
+// Re-export the central computer so existing imports keep working.
+export { computePhaseStatus } from '@/lib/studio/phaseStatus';
 
 export default function ProjectDashboard() {
   const { id } = useParams();
@@ -96,40 +67,30 @@ export default function ProjectDashboard() {
   const project = projectQ.data;
   const isLoading = projectQ.isLoading;
 
-  const countsQ = useQuery({
-    queryKey: ['project-phase-counts', id, user?.id],
+  const summaryQ = useQuery({
+    queryKey: ['project-phase-summary', id, user?.id],
     queryFn: async () => {
-      const [s, c, im, vd, au, ex] = await Promise.all([
-        scenesApi.listByProject(id),
-        charactersApi.listByProject(id),
-        sceneImagesApi.listByProject(id),
-        sceneVideosApi.listByProject(id),
-        audioAssetsApi.listByProject(id),
-        exportsApi.latest(id),
-      ]);
-      return {
-        scenes: s.data ?? [],
-        characters: c.data ?? [],
-        images: im.data ?? [],
-        videos: vd.data ?? [],
-        audio: au.data ?? [],
-        exportRow: ex.data ?? null,
-      };
+      const result = await getProjectPhaseSummary(id);
+      return result.summary;
     },
     enabled: isReady && !!user && !!id,
+    refetchOnWindowFocus: true,
   });
-  const counts = countsQ.data;
+  const summary = summaryQ.data;
 
-  const phaseStatus = useMemo(() => {
-    if (!counts) return {};
-    return computePhaseStatus(counts);
-  }, [counts]);
+  // Best-effort sync computed status back to the projects row so the My
+  // Projects list reflects the latest state without manual edits.
+  useEffect(() => {
+    if (!project || !summary) return;
+    syncProjectSummary(id, summary, project);
+  }, [id, project, summary]);
 
-  const completedIds = PHASES.filter((p) => phaseStatus[p.id]).map((p) => p.id);
-  const progressPct = Math.round((completedIds.length / PHASES.length) * 100);
-  const nextIncomplete = PHASES.find((p) => !phaseStatus[p.id]) ?? PHASES[PHASES.length - 1];
-  const currentPhaseId = nextIncomplete.id;
-  const currentPhase = PHASES.find((p) => p.id === currentPhaseId);
+  const phaseStatus = summary?.phases ?? {};
+  const progressPct = summary?.progress ?? 0;
+  const currentPhaseId = (summary?.currentPhase && summary.currentPhase !== 'complete')
+    ? summary.currentPhase
+    : 'export';
+  const currentPhase = PHASES.find((p) => p.id === currentPhaseId) ?? PHASES[PHASES.length - 1];
 
   if (!isReady || isLoading) {
     return (

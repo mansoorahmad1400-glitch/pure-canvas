@@ -14,11 +14,22 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { projectsApi } from '@/lib/studio/api';
+import { getProjectPhaseSummary, syncProjectSummary } from '@/lib/studio/phaseStatus';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+
+const PHASE_LABELS = {
+  storyboard: 'Storyboard',
+  characters: 'Characters',
+  images: 'Images',
+  animate: 'Animate',
+  audio: 'Audio',
+  export: 'Export',
+  complete: 'Complete',
+};
 
 const statusConfig = {
   draft:      { icon: Clock,        label: 'Draft',      cls: 'bg-muted text-muted-foreground' },
@@ -33,8 +44,31 @@ const typeEmoji = {
 };
 
 function ProjectCard({ project, onDelete }) {
-  const status = statusConfig[project.status] || statusConfig.draft;
+  // Per-card computed summary — keeps My Projects in sync with real workflow
+  // state, even if the projects row hasn't been synced yet.
+  const summaryQ = useQuery({
+    queryKey: ['project-summary-card', project.id],
+    queryFn: async () => (await getProjectPhaseSummary(project.id)).summary,
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+  });
+  const summary = summaryQ.data;
+
+  // Best-effort write-back so the row itself reflects the truth on next load.
+  useEffect(() => {
+    if (!summary) return;
+    syncProjectSummary(project.id, summary, project);
+  }, [summary, project]);
+
+  const effectiveStatus = summary?.status ?? project.status ?? 'draft';
+  const effectivePhase = summary?.currentPhase ?? project.current_phase ?? 'storyboard';
+  const effectiveProgress = summary?.progress ?? Number(project.progress) ?? 0;
+  const isReadyForRender = !!summary?.exportReady && !summary?.exportComplete;
+
+  const status = statusConfig[effectiveStatus] || statusConfig.draft;
   const StatusIcon = status.icon;
+  const phaseLabel = PHASE_LABELS[effectivePhase] || effectivePhase;
+
   return (
     <motion.div
       layout
@@ -43,14 +77,21 @@ function ProjectCard({ project, onDelete }) {
       exit={{ opacity: 0, scale: 0.95 }}
       className="group p-5 rounded-2xl border border-border/50 bg-card/50 hover:bg-card hover:border-primary/20 transition-all duration-300 flex flex-col gap-3"
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg shrink-0">
           {typeEmoji[project.project_type] || <Film className="w-5 h-5 text-primary" />}
         </div>
-        <Badge className={`${status.cls} border-0 text-xs shrink-0`}>
-          <StatusIcon className="w-3 h-3 mr-1" />
-          {status.label}
-        </Badge>
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          {isReadyForRender && (
+            <Badge className="bg-amber-500/15 text-amber-400 border-0 text-[10px]">
+              Ready for Render
+            </Badge>
+          )}
+          <Badge className={`${status.cls} border-0 text-xs shrink-0`}>
+            <StatusIcon className="w-3 h-3 mr-1" />
+            {status.label}
+          </Badge>
+        </div>
       </div>
 
       <div className="flex-1 min-w-0">
@@ -65,10 +106,10 @@ function ProjectCard({ project, onDelete }) {
 
       <div className="space-y-1">
         <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>Phase: <span className="text-foreground/80">{project.current_phase || 'storyboard'}</span></span>
-          <span>{Math.round(project.progress || 0)}%</span>
+          <span>Phase: <span className="text-foreground/80 capitalize">{phaseLabel}</span></span>
+          <span>{Math.round(effectiveProgress)}%</span>
         </div>
-        <Progress value={Number(project.progress) || 0} className="h-1" />
+        <Progress value={Number(effectiveProgress) || 0} className="h-1" />
       </div>
 
       <div className="flex items-center gap-2 pt-1 border-t border-border/40">
