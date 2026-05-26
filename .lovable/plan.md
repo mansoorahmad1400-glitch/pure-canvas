@@ -1,122 +1,78 @@
-# Step 4: Storyboard Phase Editor
+## Step 5.7 — Stabilize Projects, Storyboard, Characters
 
-Build the Storyboard editor as Phase 1 of the simplified StudioOne workflow. Scope is strictly UI + CRUD against the existing `storyboard_scenes` table. No generation, no API integrations, no other phases.
+Surgical fixes only. No new phases, no APIs, no Base44 gem logic.
 
-## Files
+---
 
-**New**
-- `src/pages/StoryboardPhase.jsx` — page shell (header, helper, Back/Save/Add Scene, empty state, scene list)
-- `src/components/storyboard/SceneEditorCard.jsx` — collapsible scene card with Visual/Audio tabs, reorder/duplicate/delete/approve
-- `src/components/storyboard/VisualSectionForm.jsx` — Visual fields
-- `src/components/storyboard/AudioSectionForm.jsx` — Audio fields + mode-driven defaults
+### 1. Fix blank screen on `/projects` and `/project/:id`
 
-**Edited**
-- `src/App.jsx` — route `/project/:id/storyboard` → `StoryboardPhase` (currently goes to `PhasePlaceholder`)
-- `src/lib/studio/api.js` — add `scenesApi.listByProject` sort already correct; add small helpers: `nextSceneNumber`, `duplicateScene`, `reorderScenes` (bulk update scene_number)
+Root cause: `useQuery` runs immediately on mount before `supabase.auth` has hydrated from `localStorage`. RLS returns no rows for an unauthenticated request, and on first navigation the previous `AnimatePresence` page can unmount before the new one's lazy chunk + auth resolve, leaving a black gap.
 
-No DB migration — `storyboard_scenes` already has all required columns. We'll use existing `visual_status` ('draft'|'ready'), `audio_status` ('draft'|'ready'), and add a derived `approval_status` stored in `visual_status`+`audio_status` both = `'approved'` (kept simple — no schema change).
+Changes:
+- **`src/hooks/useAuthReady.js`** (new): tiny hook returning `{ user, isReady }`. Calls `supabase.auth.getSession()` first, then subscribes to `onAuthStateChange`. Cleans up properly.
+- **`src/pages/Projects.jsx`**: pull `{ user, isReady } = useAuthReady()`. Add `enabled: isReady && !!user` to the `projects-v2` query. Render `PageLoader` while `!isReady`. Render dedicated error state + Retry button if `isError`.
+- **`src/pages/ProjectDashboard.jsx`**: same gating — both `project` and `project-phase-counts` queries get `enabled: isReady && !!user && !!id`. Render loader during hydration, error state with Retry if either query fails, and a "Project not found" state when `project` is `null`. Keep the existing project header rendering, just fix the early-return states.
+- Keep `RequireAuth` as-is (it already waits for session for the redirect decision); this fixes the data-fetch race specifically.
 
-## Page layout (`StoryboardPhase.jsx`)
+### 2. Storyboard — Save All + Approve feedback
 
-```
-[← Back to Dashboard]   {Project Title}        [Save All] [+ Add Scene]
-Storyboard
-Plan each scene before generating characters, images, animation, and audio.
+Save All currently *does* work but feels dead because approval persists immediately and clears the dirty set, so the button disables with no toast. Approval also doesn't surface validation errors.
 
-[Scene 1 card]
-[Scene 2 card]
-...
-(or empty state: "No scenes yet. Add your first scene to begin your storyboard.")
-```
+Changes in **`src/pages/StoryboardPhase.jsx`**:
+- `toggleApprove`: wrap in try/catch/finally. On validation fail (`canApprove(s).ok === false`), show toast "Add Visual or Audio content first" — currently silently no-ops. On Supabase error, restore previous status locally and show destructive toast. On success, show "Scene N approved" / "Scene N unapproved" toast (so the user sees feedback).
+- `saveAll`: when `dirtyIds.size === 0`, instead of toast "Nothing to save" use a softer toast and keep button disabled with tooltip "No unsaved changes". Add try/catch around the Promise.all so an exception (e.g. network) surfaces a destructive toast and resets `savingAll`.
+- Save All button: add `title` attribute showing "No unsaved changes" / "Save N pending change(s)" so the disabled state is explained. Show a brief "Saved ✓" label for ~1.5 s after a successful save (reuse `justSavedIds` or a new `lastSavedAt`).
 
-- Loads project + scenes via React Query.
-- Local dirty-state map; "Save All" persists changed scenes; per-card auto "Saved ✓" indicator after save.
-- "Add Scene" inserts a new draft scene with next `scene_number`, default `duration=6`, defaults pulled from project type (see §Project type defaults).
+No schema or RLS change needed — current behavior already persists; the user just lacked feedback.
 
-## Scene card (`SceneEditorCard.jsx`)
+### 3. Characters — infinite spinner + dynamic import crash
 
-Header row:
-- `Scene {n}` badge · Title input · Duration (sec, default 6) · Status pill (Draft/Ready/Approved)
-- Actions: ↑ ↓ · Duplicate · Delete · Collapse/Expand
+Two distinct issues:
 
-Body (when expanded): Tabs `Visual | Audio` using existing shadcn `Tabs`.
+a) **Dynamic-import crash** ("Failed to fetch dynamically imported module: CharactersPhase.jsx"). This is a known Vite issue when a lazy chunk fails to load (transient network / dev reload). Add a small retry wrapper.
+- **`src/App.jsx`**: replace each `lazy(() => import('...'))` for app-shell pages with a `lazyWithRetry` helper that retries the import once after 400 ms and, on a second failure, hard-reloads the page. Apply at minimum to `CharactersPhase`, `StoryboardPhase`, `Projects`, `ProjectDashboard`, `NewProjectV2`.
 
-Footer: `Approve Storyboard Scene` button — disabled unless approval rule passes (see §Approval rule). When approved, both `visual_status` and `audio_status` set to `'approved'`; status pill turns green; button toggles to `Unapprove`.
+b) **Page stuck on spinner**. `if (projectQ.isLoading || charactersQ.isLoading)` traps the page if either query is permanently pending (it can be when auth isn't ready — the query is `enabled` but returns nothing usable). Plus, errors aren't surfaced.
 
-## Visual section (`VisualSectionForm.jsx`)
+Changes in **`src/pages/CharactersPhase.jsx`**:
+- Use `useAuthReady`, gate both queries with `enabled: isReady && !!user && !!projectId`.
+- Loading guard: only show the spinner while `!isReady || (projectQ.isFetching && !projectQ.data) || (charactersQ.isFetching && !charactersQ.data)`. If a query `isError`, render an inline error card with "Retry" calling `refetch()`.
+- `handleExtract`: wrap in try/catch/**finally** so `setExtracting(false)` always runs. If `scenesQ.data` is missing, refetch first. Pre-check: if no scene has `visual_status === 'approved'` AND `audio_status === 'approved'`, show toast "Approve at least one Storyboard scene before extracting characters." and return without spinning.
+- `handleAdd`, `handleDelete`, `handleApprove`, `handleUnapprove`, `handleSaveAll`: all wrapped with try/catch/finally for consistent error toasts and guaranteed loading-state cleanup.
 
-Fields mapped to `storyboard_scenes` columns:
-- Scene Title → `scene_title`
-- Story / Action → `story_text`
-- Characters in Scene → `characters` (comma-separated input → string[])
-- Environment / Location Description → `environment_description`
-- Camera Direction → `camera_direction`
-- Image Prompt → `image_prompt`
-- Animation Prompt → `animation_prompt`
-- Transition to Next Scene → `transition_to_next` (select: cut, fade, dissolve, wipe)
+### 4. Characters table safety
 
-Helper text under heading: "Describe what the viewer sees in this scene."
+Current schema (verified) already has every required column: `id, project_id, user_id, name, role, description, appearance, personality, voice_style, style_prompt, reference_image_url, approval_status, created_at, updated_at`. **No migration needed.** Plan notes this so we don't add a redundant migration.
 
-## Audio section (`AudioSectionForm.jsx`)
+### 5. Global error UX
 
-Fields:
-- Audio Mode → `audio_mode` (select: dialogue | narration | mixed | rhyme_song | silent)
-- Dialogue → `dialogue_text` (textarea; helper: "Format: `Character: line`. Only the line will be spoken.")
-- Narration → `narration_text`
-- Rhyme / Song Lyrics → `rhyme_lyrics` (only shown when mode = rhyme_song or mixed)
-- Background Music Prompt → `background_music_prompt`
-- Sound Effects Prompt → `sfx_prompt`
-- Voice Style → `voice_style`
-- Audio Timing Notes → `audio_timing` (free text — stored as numeric currently; will store as text in a new column? **see open question**)
+- Reusable **`src/components/studio/QueryErrorState.jsx`** (new): renders a compact card with the error message and a Retry button; used by Projects, ProjectDashboard, StoryboardPhase, CharactersPhase.
+- Toast already routes through sonner (dismissible) — no change.
 
-Conditional visibility by mode (silent hides most fields; rhyme_song emphasizes lyrics).
+### 6. Preserve
 
-Note: dialogue speaker stripping is a documentation/UX convention here — the actual TTS strip happens later in the Audio phase. We just render the helper text.
+- 6-phase dashboard, no Location phase, Storyboard Visual + Audio sections, `duration_seconds`, dev/admin access, project creation, sample scenes, sonner toaster — all untouched.
 
-## Project type defaults
+---
 
-On new scene insert, pick `audio_mode` default from `projects.project_type`:
-- `rhyme | nursery_rhyme | kids_song | musical` → `rhyme_song`
-- `documentary | educational | explainer` → `narration`
-- `story | fairy_tale | fantasy | drama` → `dialogue`
-- everything else → `dialogue`
+### Files
 
-## Approval rule
+New:
+- `src/hooks/useAuthReady.js`
+- `src/components/studio/QueryErrorState.jsx`
 
-A scene is approvable iff:
-- Visual: `story_text` OR `image_prompt` non-empty (basic content)
-- Audio: at least one of — `dialogue_text`, `narration_text`, `rhyme_lyrics`, `background_music_prompt`, `sfx_prompt`, or `audio_mode === 'silent'`
+Edited:
+- `src/App.jsx` (lazyWithRetry only)
+- `src/pages/Projects.jsx`
+- `src/pages/ProjectDashboard.jsx`
+- `src/pages/StoryboardPhase.jsx`
+- `src/pages/CharactersPhase.jsx`
 
-Approve button disabled with tooltip explaining what's missing.
+No DB migration. No edge functions. No API calls.
 
-## Reorder / duplicate / delete
+### Acceptance checks I will verify
 
-- Move up/down: swap `scene_number` with neighbor (two updates).
-- Duplicate: insert clone with `scene_number = current + 1` and shift subsequent scenes +1 (bulk update in a single Promise.all).
-- Delete: remove row, then renumber remaining scenes to be contiguous.
-
-## Save behavior
-
-- Each field edit marks card dirty.
-- "Save All" iterates dirty cards → `scenesApi.update(id, patch)` in parallel; toast "Saved".
-- Per-card inline "Saved ✓" appears for 2s after success.
-- Navigating away with unsaved changes triggers a confirm dialog.
-
-## Open question (small)
-
-`audio_timing` is currently `numeric` in the schema, but the spec asks for free-text "Audio Timing Notes". Two options:
-1. Keep numeric, label it "Audio Timing (seconds)".
-2. Tiny migration to change `audio_timing` to `text`.
-
-Default choice: **Option 1** (no schema change, stays in scope of Step 4). Will flag in the UI as "Audio Timing (sec)".
-
-## Acceptance checklist
-
-- Route `/project/:id/storyboard` renders new editor (replaces placeholder).
-- Back button → `/project/:id` dashboard.
-- Add / edit / delete / duplicate / reorder works and persists.
-- Visual + Audio in separate tabs, no mixing.
-- All listed fields save and reload after refresh.
-- Approval gating enforced.
-- No changes to auth, dashboard, generation, animation, audio synthesis, export, or any API integration.
-- Location phase not reintroduced.
+1. `/projects` and `/project/:id` render content on first visit without refresh.
+2. Storyboard Save All shows toast + "Saved ✓" feedback; Approve shows toast and persists across refresh.
+3. Characters page never shows the dynamic-import crash (retry wrapper) and never spins forever (finally + error state + retry).
+4. Extract from Storyboard with zero approved scenes shows friendly message instead of hanging.
