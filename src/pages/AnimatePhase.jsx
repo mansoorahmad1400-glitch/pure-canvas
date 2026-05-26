@@ -262,6 +262,24 @@ function SceneVideoCard({
               </div>
             )}
 
+            <AssetUploadButton
+              projectId={projectId}
+              kind="video"
+              sceneId={scene.id}
+              assetRole="scene_video"
+              label="Upload Video"
+              onUploaded={async ({ publicUrl }) => {
+                await onSaveRecord({
+                  scene_id: scene.id,
+                  image_id: image.id,
+                  prompt_used: prompt,
+                  video_url: publicUrl,
+                  provider: 'manual_upload',
+                  duration_seconds: scene.duration_seconds ?? 6,
+                });
+              }}
+            />
+
             <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" disabled={busy === 'mock'} onClick={addMock}>
               {busy === 'mock' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
               Use Mock Video Placeholder
