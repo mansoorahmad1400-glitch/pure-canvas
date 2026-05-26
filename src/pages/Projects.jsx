@@ -17,6 +17,8 @@ import {
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { projectsApi } from '@/lib/studio/api';
+import { useAuthReady } from '@/hooks/useAuthReady';
+import QueryErrorState from '@/components/studio/QueryErrorState';
 
 const statusConfig = {
   draft:      { icon: Clock,        label: 'Draft',      cls: 'bg-muted text-muted-foreground' },
@@ -90,11 +92,17 @@ function ProjectCard({ project, onDelete }) {
 export default function Projects() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { user, isReady } = useAuthReady();
   const [pendingDelete, setPendingDelete] = useState(null);
 
-  const { data: projects = [], isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['projects-v2'],
-    queryFn: async () => (await projectsApi.list()).data ?? [],
+  const { data: projects = [], isLoading, isError, error, refetch, isFetching } = useQuery({
+    queryKey: ['projects-v2', user?.id],
+    queryFn: async () => {
+      const { data, error } = await projectsApi.list();
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: isReady && !!user,
   });
 
   const handleDelete = async () => {
