@@ -22,7 +22,7 @@ import TermsPrompt from '@/components/onboarding/TermsPrompt';
 
 
 const navItems = [
-  { path: '/', labelKey: 'nav.home', icon: Home },
+  { path: '/home', labelKey: 'nav.home', icon: Home },
   { path: '/studio', labelKey: 'nav.studio', icon: Sparkles, requireAuth: true },
   { path: '/projects', labelKey: 'nav.projects', icon: FolderOpen, requireAuth: true },
   { path: '/tutorial', labelKey: 'nav.tutorial', icon: BookOpen },
