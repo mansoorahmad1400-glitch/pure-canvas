@@ -231,26 +231,41 @@ export default function CharactersPhase() {
   };
 
   const handleSaveAll = async () => {
-    if (dirtyIds.size === 0) return;
+    if (dirtyIds.size === 0) {
+      toast({ title: 'No unsaved changes' });
+      return;
+    }
     setSavingAll(true);
     const ids = Array.from(dirtyIds);
     const targets = characters.filter((c) => ids.includes(c.id));
-    const results = await Promise.allSettled(
-      targets.map((c) => charactersApi.update(c.id, pickEditable(c)))
-    );
-    const okIds = [];
-    let failed = 0;
-    results.forEach((r, i) => {
-      if (r.status === 'fulfilled' && !r.value.error) okIds.push(targets[i].id);
-      else failed++;
-    });
-    clearDirty(okIds);
-    flashSaved(okIds);
-    setSavingAll(false);
-    toast({
-      title: failed ? `Saved ${okIds.length}, ${failed} failed` : `Saved ${okIds.length} character${okIds.length === 1 ? '' : 's'}`,
-      variant: failed ? 'destructive' : 'default',
-    });
+    try {
+      const results = await Promise.allSettled(
+        targets.map((c) => charactersApi.update(c.id, pickEditable(c)))
+      );
+      const okIds = [];
+      let failed = 0;
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled' && !r.value.error) okIds.push(targets[i].id);
+        else failed++;
+      });
+      clearDirty(okIds);
+      flashSaved(okIds);
+      toast({
+        title: failed
+          ? `Saved ${okIds.length}, ${failed} failed`
+          : `Saved ${okIds.length} character${okIds.length === 1 ? '' : 's'}`,
+        variant: failed ? 'destructive' : 'default',
+      });
+    } catch (err) {
+      console.error('Save all failed', err);
+      toast({
+        title: 'Save failed',
+        description: err?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingAll(false);
+    }
   };
 
   const goBack = () => {
@@ -258,10 +273,31 @@ export default function CharactersPhase() {
     navigate(`/project/${projectId}`);
   };
 
-  if (projectQ.isLoading || charactersQ.isLoading) {
+  const showInitialLoader =
+    !isReady ||
+    (projectQ.isLoading && !projectQ.data) ||
+    (charactersQ.isLoading && !charactersQ.data);
+
+  if (showInitialLoader) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (projectQ.isError || charactersQ.isError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <QueryErrorState
+          title="Couldn't load characters"
+          error={projectQ.error || charactersQ.error}
+          onRetry={() => {
+            projectQ.refetch();
+            charactersQ.refetch();
+            scenesQ.refetch();
+          }}
+        />
       </div>
     );
   }
