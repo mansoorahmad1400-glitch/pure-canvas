@@ -125,6 +125,8 @@ export const audioAssetsApi = {
       .select('*')
       .eq('project_id', project_id)
       .order('created_at', { ascending: false }),
+  listByScene: (scene_id) =>
+    supabase.from('project_audio_assets').select('*').eq('scene_id', scene_id),
   create: async (payload) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
@@ -134,11 +136,22 @@ export const audioAssetsApi = {
       .select()
       .single();
   },
+  update: (id, patch) =>
+    supabase.from('project_audio_assets').update(patch).eq('id', id).select().single(),
   approve: (id) =>
     supabase
       .from('project_audio_assets')
       .update({ approval_status: 'approved' })
-      .eq('id', id),
+      .eq('id', id)
+      .select()
+      .single(),
+  unapprove: (id) =>
+    supabase
+      .from('project_audio_assets')
+      .update({ approval_status: 'pending' })
+      .eq('id', id)
+      .select()
+      .single(),
   remove: (id) => supabase.from('project_audio_assets').delete().eq('id', id),
 };
 
