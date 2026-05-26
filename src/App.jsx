@@ -26,6 +26,8 @@ const Roadmap      = lazy(() => import('@/pages/Roadmap'));
 const GemHistory   = lazy(() => import('@/pages/GemHistory'));
 const Storyboard        = lazy(() => import('@/pages/Storyboard'));
 const ProductionStudio  = lazy(() => import('@/pages/ProductionStudio'));
+const ProjectDashboard  = lazy(() => import('@/pages/ProjectDashboard'));
+const PhasePlaceholder  = lazy(() => import('@/pages/PhasePlaceholder'));
 const Login             = lazy(() => import('@/pages/Login'));
 
 function PageLoader() {
@@ -88,8 +90,10 @@ function AnimatedRoutes() {
           <Route path="/upgrade" element={<PageTransition><Upgrade /></PageTransition>} />
           <Route path="/studio" element={<PageTransition><RequireAuth><Dashboard /></RequireAuth></PageTransition>} />
           <Route path="/projects" element={<PageTransition><RequireAuth><Projects /></RequireAuth></PageTransition>} />
-          <Route path="/project/:id" element={<PageTransition><RequireAuth><ProductionStudio /></RequireAuth></PageTransition>} />
+          <Route path="/project/:id" element={<PageTransition><RequireAuth><ProjectDashboard /></RequireAuth></PageTransition>} />
+          <Route path="/project/:id/legacy" element={<PageTransition><RequireAuth><ProductionStudio /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/advanced" element={<PageTransition><RequireAuth><ViewBlueprint /></RequireAuth></PageTransition>} />
+          <Route path="/project/:id/:phase" element={<PageTransition><RequireAuth><PhasePlaceholder /></RequireAuth></PageTransition>} />
           <Route path="/account" element={<PageTransition><RequireAuth><Account /></RequireAuth></PageTransition>} />
           <Route path="/admin" element={<PageTransition><RequireAuth><Admin /></RequireAuth></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
