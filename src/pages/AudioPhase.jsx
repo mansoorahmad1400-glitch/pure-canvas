@@ -144,7 +144,7 @@ function AssetRow({ asset, onApprove, onUnapprove, onDelete, onReplace }) {
   );
 }
 
-function SceneAudioCard({ scene, video, sceneAssets, onAddAsset, onApprove, onUnapprove, onDelete, onReplace, onMarkSilent }) {
+function SceneAudioCard({ scene, video, sceneAssets, projectId, onAddAsset, onApprove, onUnapprove, onDelete, onReplace, onMarkSilent }) {
   const [busy, setBusy] = useState(null);
   const [urlMode, setUrlMode] = useState(null); // 'voice' | 'music' | 'sfx' | 'rhyme_song'
   const [urlInput, setUrlInput] = useState('');
