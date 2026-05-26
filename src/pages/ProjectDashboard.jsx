@@ -62,7 +62,16 @@ export function computePhaseStatus({ scenes, characters, images, videos, audio, 
     characters.length > 0 && characters.every((c) => c.approval_status === 'approved');
   const imagesDone = images.some((i) => i.approval_status === 'approved');
   const animateDone = videos.some((v) => v.approval_status === 'approved');
-  const audioDone = audio.some((a) => a.approval_status === 'approved');
+  // Audio phase complete = at least one scene has both an approved video AND
+  // an approved audio asset (or is approved as silent, which is stored as an
+  // approved asset with provider='silent').
+  const approvedVideoSceneIds = new Set(
+    videos.filter((v) => v.approval_status === 'approved' && v.video_url).map((v) => v.scene_id)
+  );
+  const approvedAudioSceneIds = new Set(
+    audio.filter((a) => a.approval_status === 'approved' && a.scene_id).map((a) => a.scene_id)
+  );
+  const audioDone = [...approvedVideoSceneIds].some((sid) => approvedAudioSceneIds.has(sid));
   const exportDone = !!(exportRow && exportRow.status === 'completed');
   return {
     storyboard, characters: charactersDone, images: imagesDone,
