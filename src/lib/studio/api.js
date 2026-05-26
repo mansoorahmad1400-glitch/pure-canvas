@@ -85,7 +85,11 @@ export const sceneImagesApi = {
       .single();
   },
   approve: (id) =>
-    supabase.from('scene_images').update({ approval_status: 'approved' }).eq('id', id),
+    supabase.from('scene_images').update({ approval_status: 'approved' }).eq('id', id).select().single(),
+  unapprove: (id) =>
+    supabase.from('scene_images').update({ approval_status: 'pending' }).eq('id', id).select().single(),
+  update: (id, patch) =>
+    supabase.from('scene_images').update(patch).eq('id', id).select().single(),
   remove: (id) => supabase.from('scene_images').delete().eq('id', id),
 };
 
