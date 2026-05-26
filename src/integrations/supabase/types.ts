@@ -88,43 +88,52 @@ export type Database = {
       }
       characters: {
         Row: {
+          appearance: string | null
           approval_status: string
           created_at: string
           description: string | null
           id: string
           name: string
+          personality: string | null
           project_id: string
           reference_image_url: string | null
           role: string | null
           style_prompt: string | null
           updated_at: string
           user_id: string
+          voice_style: string | null
         }
         Insert: {
+          appearance?: string | null
           approval_status?: string
           created_at?: string
           description?: string | null
           id?: string
           name: string
+          personality?: string | null
           project_id: string
           reference_image_url?: string | null
           role?: string | null
           style_prompt?: string | null
           updated_at?: string
           user_id: string
+          voice_style?: string | null
         }
         Update: {
+          appearance?: string | null
           approval_status?: string
           created_at?: string
           description?: string | null
           id?: string
           name?: string
+          personality?: string | null
           project_id?: string
           reference_image_url?: string | null
           role?: string | null
           style_prompt?: string | null
           updated_at?: string
           user_id?: string
+          voice_style?: string | null
         }
         Relationships: [
           {
