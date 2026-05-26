@@ -47,6 +47,7 @@ const ProjectDashboard  = lazyWithRetry(() => import('@/pages/ProjectDashboard')
 const PhasePlaceholder  = lazyWithRetry(() => import('@/pages/PhasePlaceholder'));
 const StoryboardPhase   = lazyWithRetry(() => import('@/pages/StoryboardPhase'));
 const CharactersPhase   = lazyWithRetry(() => import('@/pages/CharactersPhase'));
+const ImagesPhase       = lazyWithRetry(() => import('@/pages/ImagesPhase'));
 const NewProjectV2      = lazyWithRetry(() => import('@/pages/NewProjectV2'));
 const Login             = lazyWithRetry(() => import('@/pages/Login'));
 
