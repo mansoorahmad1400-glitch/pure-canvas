@@ -76,7 +76,7 @@ function statusBadge(record) {
 
 // ---------- per-scene card ----------
 function SceneImageCard({
-  scene, record, project, characters,
+  scene, record, project, characters, projectId,
   onSaveRecord, onApprove, onUnapprove, onDelete,
 }) {
   const [prompt, setPrompt] = useState(
