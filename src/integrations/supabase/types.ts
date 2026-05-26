@@ -756,8 +756,10 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          notes: string | null
           project_id: string
           prompt_used: string | null
+          provider: string | null
           scene_id: string
           updated_at: string
           user_id: string
@@ -767,8 +769,10 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          notes?: string | null
           project_id: string
           prompt_used?: string | null
+          provider?: string | null
           scene_id: string
           updated_at?: string
           user_id: string
@@ -778,8 +782,10 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          notes?: string | null
           project_id?: string
           prompt_used?: string | null
+          provider?: string | null
           scene_id?: string
           updated_at?: string
           user_id?: string
