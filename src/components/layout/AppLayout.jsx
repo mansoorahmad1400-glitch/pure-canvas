@@ -22,7 +22,7 @@ import TermsPrompt from '@/components/onboarding/TermsPrompt';
 
 
 const navItems = [
-  { path: '/', labelKey: 'nav.home', icon: Home },
+  { path: '/home', labelKey: 'nav.home', icon: Home },
   { path: '/studio', labelKey: 'nav.studio', icon: Sparkles, requireAuth: true },
   { path: '/projects', labelKey: 'nav.projects', icon: FolderOpen, requireAuth: true },
   { path: '/tutorial', labelKey: 'nav.tutorial', icon: BookOpen },
@@ -46,7 +46,7 @@ export default function AppLayout() {
   };
 
   const bottomTabs = [
-    { path: '/', label: 'Home', icon: Home },
+    { path: '/home', label: 'Home', icon: Home },
     { path: '/studio', label: 'Studio', icon: Sparkles, requireAuth: true },
     { path: '/projects', label: 'Projects', icon: FolderOpen, requireAuth: true },
     { path: '/account', label: 'Account', icon: User, requireAuth: true },
