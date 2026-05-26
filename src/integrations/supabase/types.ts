@@ -86,6 +86,56 @@ export type Database = {
         }
         Relationships: []
       }
+      characters: {
+        Row: {
+          approval_status: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          project_id: string
+          reference_image_url: string | null
+          role: string | null
+          style_prompt: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approval_status?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          project_id: string
+          reference_image_url?: string | null
+          role?: string | null
+          style_prompt?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approval_status?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          project_id?: string
+          reference_image_url?: string | null
+          role?: string | null
+          style_prompt?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "characters_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       EconomyConfig: {
         Row: {
           action_costs: Json | null
@@ -193,6 +243,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      final_exports: {
+        Row: {
+          approved_scene_ids: string[] | null
+          created_at: string
+          final_video_url: string | null
+          id: string
+          preview_video_url: string | null
+          project_id: string
+          status: string
+          updated_at: string
+          user_id: string
+          validation_notes: string | null
+        }
+        Insert: {
+          approved_scene_ids?: string[] | null
+          created_at?: string
+          final_video_url?: string | null
+          id?: string
+          preview_video_url?: string | null
+          project_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          validation_notes?: string | null
+        }
+        Update: {
+          approved_scene_ids?: string[] | null
+          created_at?: string
+          final_video_url?: string | null
+          id?: string
+          preview_video_url?: string | null
+          project_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          validation_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "final_exports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       GemTransaction: {
         Row: {
@@ -467,6 +564,66 @@ export type Database = {
         }
         Relationships: []
       }
+      project_audio_assets: {
+        Row: {
+          approval_status: string
+          asset_type: string
+          audio_url: string | null
+          created_at: string
+          duration: number | null
+          id: string
+          project_id: string
+          prompt_used: string | null
+          provider: string | null
+          scene_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approval_status?: string
+          asset_type: string
+          audio_url?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          project_id: string
+          prompt_used?: string | null
+          provider?: string | null
+          scene_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approval_status?: string
+          asset_type?: string
+          audio_url?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          project_id?: string
+          prompt_used?: string | null
+          provider?: string | null
+          scene_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_audio_assets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_audio_assets_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "storyboard_scenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ProjectCharacter: {
         Row: {
           consistency_score: number | null
@@ -538,6 +695,245 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          current_phase: string
+          id: string
+          language_primary: string | null
+          language_secondary: string | null
+          progress: number
+          project_type: string
+          status: string
+          style: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_phase?: string
+          id?: string
+          language_primary?: string | null
+          language_secondary?: string | null
+          progress?: number
+          project_type?: string
+          status?: string
+          style?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_phase?: string
+          id?: string
+          language_primary?: string | null
+          language_secondary?: string | null
+          progress?: number
+          project_type?: string
+          status?: string
+          style?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      scene_images: {
+        Row: {
+          approval_status: string
+          created_at: string
+          id: string
+          image_url: string | null
+          project_id: string
+          prompt_used: string | null
+          scene_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approval_status?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          project_id: string
+          prompt_used?: string | null
+          scene_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approval_status?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          project_id?: string
+          prompt_used?: string | null
+          scene_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scene_images_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scene_images_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "storyboard_scenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scene_videos: {
+        Row: {
+          approval_status: string
+          created_at: string
+          duration: number | null
+          id: string
+          project_id: string
+          provider: string | null
+          scene_id: string
+          updated_at: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          approval_status?: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          project_id: string
+          provider?: string | null
+          scene_id: string
+          updated_at?: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          approval_status?: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          project_id?: string
+          provider?: string | null
+          scene_id?: string
+          updated_at?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scene_videos_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scene_videos_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "storyboard_scenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      storyboard_scenes: {
+        Row: {
+          animation_prompt: string | null
+          audio_mode: string
+          audio_status: string
+          audio_timing: number | null
+          background_music_prompt: string | null
+          camera_direction: string | null
+          characters: string[] | null
+          created_at: string
+          dialogue_text: string | null
+          environment_description: string | null
+          id: string
+          image_prompt: string | null
+          narration_text: string | null
+          project_id: string
+          rhyme_lyrics: string | null
+          scene_number: number
+          scene_title: string | null
+          sfx_prompt: string | null
+          story_text: string | null
+          transition_to_next: string | null
+          updated_at: string
+          user_id: string
+          visual_status: string
+          voice_style: string | null
+        }
+        Insert: {
+          animation_prompt?: string | null
+          audio_mode?: string
+          audio_status?: string
+          audio_timing?: number | null
+          background_music_prompt?: string | null
+          camera_direction?: string | null
+          characters?: string[] | null
+          created_at?: string
+          dialogue_text?: string | null
+          environment_description?: string | null
+          id?: string
+          image_prompt?: string | null
+          narration_text?: string | null
+          project_id: string
+          rhyme_lyrics?: string | null
+          scene_number: number
+          scene_title?: string | null
+          sfx_prompt?: string | null
+          story_text?: string | null
+          transition_to_next?: string | null
+          updated_at?: string
+          user_id: string
+          visual_status?: string
+          voice_style?: string | null
+        }
+        Update: {
+          animation_prompt?: string | null
+          audio_mode?: string
+          audio_status?: string
+          audio_timing?: number | null
+          background_music_prompt?: string | null
+          camera_direction?: string | null
+          characters?: string[] | null
+          created_at?: string
+          dialogue_text?: string | null
+          environment_description?: string | null
+          id?: string
+          image_prompt?: string | null
+          narration_text?: string | null
+          project_id?: string
+          rhyme_lyrics?: string | null
+          scene_number?: number
+          scene_title?: string | null
+          sfx_prompt?: string | null
+          story_text?: string | null
+          transition_to_next?: string | null
+          updated_at?: string
+          user_id?: string
+          visual_status?: string
+          voice_style?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storyboard_scenes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       StoryboardDirectorScene: {
         Row: {
