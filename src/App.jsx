@@ -49,6 +49,7 @@ const StoryboardPhase   = lazyWithRetry(() => import('@/pages/StoryboardPhase'))
 const CharactersPhase   = lazyWithRetry(() => import('@/pages/CharactersPhase'));
 const ImagesPhase       = lazyWithRetry(() => import('@/pages/ImagesPhase'));
 const AnimatePhase      = lazyWithRetry(() => import('@/pages/AnimatePhase'));
+const AudioPhase        = lazyWithRetry(() => import('@/pages/AudioPhase'));
 const NewProjectV2      = lazyWithRetry(() => import('@/pages/NewProjectV2'));
 const Login             = lazyWithRetry(() => import('@/pages/Login'));
 
