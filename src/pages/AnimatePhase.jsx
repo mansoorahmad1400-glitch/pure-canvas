@@ -15,6 +15,7 @@ import {
 import { defaultStyleFor } from '@/lib/studio/characterExtractor';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
+import AssetUploadButton from '@/components/studio/AssetUploadButton';
 
 const MOCK_VIDEO_URL =
   'https://placehold.co/1280x720/0f172a/e2e8f0?text=Scene+Video+(Mock)';
