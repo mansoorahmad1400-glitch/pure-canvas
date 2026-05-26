@@ -1,33 +1,22 @@
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-} from "@/components/ui/toast";
+// The legacy toaster is replaced with sonner so toasts are always
+// dismissible (X button) and auto-close. Mount once at the app root.
+import { Toaster as SonnerToaster } from "sonner";
 
 export function Toaster() {
-  const { toasts } = useToast();
-
   return (
-    <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
-            {action}
-            <ToastClose />
-          </Toast>
-        );
-      })}
-      <ToastViewport />
-    </ToastProvider>
+    <SonnerToaster
+      position="top-right"
+      closeButton
+      richColors
+      duration={4000}
+      toastOptions={{
+        classNames: {
+          toast:
+            "group toast bg-background text-foreground border border-border shadow-lg",
+          description: "text-muted-foreground",
+          closeButton: "bg-background border border-border text-foreground",
+        },
+      }}
+    />
   );
-} 
+}
