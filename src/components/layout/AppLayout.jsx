@@ -3,7 +3,7 @@ import { Home, FolderOpen, Sparkles, Gem, Crown, LogOut, LogIn, ChevronDown, Set
 import { motion } from 'framer-motion';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
