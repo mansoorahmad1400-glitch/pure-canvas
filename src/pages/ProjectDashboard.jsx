@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Clapperboard, Users, ImageIcon, Video, Music, Package,
-  Loader2, ArrowRight
+  Loader2, ArrowRight, FolderOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
