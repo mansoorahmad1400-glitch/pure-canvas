@@ -12,26 +12,43 @@ import InitUserGems from '@/components/auth/InitUserGems';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
-const Home          = lazy(() => import('@/pages/Home'));
-const Projects      = lazy(() => import('@/pages/Projects'));
-const ViewBlueprint = lazy(() => import('@/pages/ViewBlueprint'));
-const Upgrade       = lazy(() => import('@/pages/Upgrade'));
-const Dashboard     = lazy(() => import('@/pages/Dashboard'));
-const Account       = lazy(() => import('@/pages/Account'));
-const Admin         = lazy(() => import('@/pages/Admin'));
-const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
-const TermsAndConditions = lazy(() => import('@/pages/TermsAndConditions'));
-const Tutorial     = lazy(() => import('@/pages/Tutorial'));
-const Roadmap      = lazy(() => import('@/pages/Roadmap'));
-const GemHistory   = lazy(() => import('@/pages/GemHistory'));
-const Storyboard        = lazy(() => import('@/pages/Storyboard'));
-const ProductionStudio  = lazy(() => import('@/pages/ProductionStudio'));
-const ProjectDashboard  = lazy(() => import('@/pages/ProjectDashboard'));
-const PhasePlaceholder  = lazy(() => import('@/pages/PhasePlaceholder'));
-const StoryboardPhase   = lazy(() => import('@/pages/StoryboardPhase'));
-const CharactersPhase   = lazy(() => import('@/pages/CharactersPhase'));
-const NewProjectV2      = lazy(() => import('@/pages/NewProjectV2'));
-const Login             = lazy(() => import('@/pages/Login'));
+// Retry-aware lazy: dynamic imports occasionally fail in dev (chunk fetch
+// races a Vite reload). Retry once after a short delay, then hard-reload.
+function lazyWithRetry(factory) {
+  return lazy(() =>
+    factory().catch((err) => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          factory().then(resolve).catch((err2) => {
+            if (typeof window !== 'undefined') window.location.reload();
+            reject(err2 || err);
+          });
+        }, 400);
+      });
+    })
+  );
+}
+
+const Home          = lazyWithRetry(() => import('@/pages/Home'));
+const Projects      = lazyWithRetry(() => import('@/pages/Projects'));
+const ViewBlueprint = lazyWithRetry(() => import('@/pages/ViewBlueprint'));
+const Upgrade       = lazyWithRetry(() => import('@/pages/Upgrade'));
+const Dashboard     = lazyWithRetry(() => import('@/pages/Dashboard'));
+const Account       = lazyWithRetry(() => import('@/pages/Account'));
+const Admin         = lazyWithRetry(() => import('@/pages/Admin'));
+const PrivacyPolicy = lazyWithRetry(() => import('@/pages/PrivacyPolicy'));
+const TermsAndConditions = lazyWithRetry(() => import('@/pages/TermsAndConditions'));
+const Tutorial     = lazyWithRetry(() => import('@/pages/Tutorial'));
+const Roadmap      = lazyWithRetry(() => import('@/pages/Roadmap'));
+const GemHistory   = lazyWithRetry(() => import('@/pages/GemHistory'));
+const Storyboard        = lazyWithRetry(() => import('@/pages/Storyboard'));
+const ProductionStudio  = lazyWithRetry(() => import('@/pages/ProductionStudio'));
+const ProjectDashboard  = lazyWithRetry(() => import('@/pages/ProjectDashboard'));
+const PhasePlaceholder  = lazyWithRetry(() => import('@/pages/PhasePlaceholder'));
+const StoryboardPhase   = lazyWithRetry(() => import('@/pages/StoryboardPhase'));
+const CharactersPhase   = lazyWithRetry(() => import('@/pages/CharactersPhase'));
+const NewProjectV2      = lazyWithRetry(() => import('@/pages/NewProjectV2'));
+const Login             = lazyWithRetry(() => import('@/pages/Login'));
 
 function PageLoader() {
   return (
