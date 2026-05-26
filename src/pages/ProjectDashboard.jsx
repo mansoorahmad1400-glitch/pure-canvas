@@ -13,6 +13,8 @@ import {
   sceneVideosApi, audioAssetsApi, exportsApi,
 } from '@/lib/studio/api';
 import PhaseCard from '@/components/studio/PhaseCard';
+import { useAuthReady } from '@/hooks/useAuthReady';
+import QueryErrorState from '@/components/studio/QueryErrorState';
 
 export const PHASES = [
   {
