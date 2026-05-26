@@ -68,7 +68,7 @@ export default function InitUserGems() {
     }
 
     if (Object.keys(updates).length > 0) {
-      base44.auth.updateMe(updates).then(refetch);
+      supabase.from('User').update(updates).eq('created_by_id', user.id).then(() => refetch());
     }
   }, [user?.id, user?.role, user?.gems_reset_date]);
 
