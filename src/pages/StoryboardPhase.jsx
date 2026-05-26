@@ -341,9 +341,15 @@ export default function StoryboardPhase() {
           <Button size="sm" variant="outline" onClick={addScene} className="gap-1.5">
             <Plus className="w-4 h-4" /> Add Scene
           </Button>
-          <Button size="sm" onClick={saveAll} disabled={savingAll || dirtyIds.size === 0} className="gap-1.5">
+          <Button
+            size="sm"
+            onClick={saveAll}
+            disabled={savingAll || dirtyIds.size === 0}
+            title={dirtyIds.size === 0 ? 'No unsaved changes' : `Save ${dirtyIds.size} change${dirtyIds.size === 1 ? '' : 's'}`}
+            className="gap-1.5"
+          >
             {savingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save All {dirtyIds.size > 0 && `(${dirtyIds.size})`}
+            {savingAll ? 'Saving…' : 'Save All'} {dirtyIds.size > 0 && `(${dirtyIds.size})`}
           </Button>
         </div>
       </div>
