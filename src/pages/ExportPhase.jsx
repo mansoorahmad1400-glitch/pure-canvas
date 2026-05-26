@@ -166,7 +166,7 @@ export default function ExportPhase() {
 
   const handleRefresh = async () => {
     await qc.invalidateQueries({ queryKey: ['export-phase', id] });
-    toast.success('Approved assets refreshed');
+    toast({ title: 'Approved assets refreshed' });
   };
 
   const buildManifest = (status) => ({
@@ -194,10 +194,10 @@ export default function ExportPhase() {
         approved_scene_ids: timeline.included.map((s) => s.scene_id),
       });
       if (res.error) throw res.error;
-      toast.success('Export manifest saved');
+      toast({ title: 'Export manifest saved' });
       await qc.invalidateQueries({ queryKey: ['export-phase', id] });
     } catch (e) {
-      toast.error(e.message || 'Failed to save manifest');
+      toast({ title: 'Failed to save manifest', description: e?.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -205,9 +205,7 @@ export default function ExportPhase() {
 
   const handleReady = async () => {
     if (readiness !== 'ready') {
-      toast.message('No approved scenes yet', {
-        description: 'Approve at least one scene with image, video, and audio (or silent).',
-      });
+      toast({ title: 'No approved scenes yet', description: 'Approve at least one scene with image, video, and audio (or silent).' });
       return;
     }
     setMarking(true);
@@ -221,12 +219,10 @@ export default function ExportPhase() {
         approved_scene_ids: timeline.included.map((s) => s.scene_id),
       });
       if (saved.error) throw saved.error;
-      toast.success('Marked Ready for Render', {
-        description: 'Backend MP4 renderer is not connected yet. Your approved timeline is saved.',
-      });
+      toast({ title: 'Marked Ready for Render', description: 'Backend MP4 renderer is not connected yet. Your approved timeline is saved.' });
       await qc.invalidateQueries({ queryKey: ['export-phase', id] });
     } catch (e) {
-      toast.error(e.message || 'Failed to mark ready');
+      toast({ title: 'Failed to mark ready', description: e?.message, variant: 'destructive' });
     } finally {
       setMarking(false);
     }
