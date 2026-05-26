@@ -151,7 +151,7 @@ export default function StoryboardPhase() {
     await Promise.all(
       after.map((s) => scenesApi.update(s.id, { scene_number: s.scene_number + 1 }))
     );
-    const cloneBody = pickEditable(src);
+    const cloneBody = pickEditableSafe(src);
     const { data, error } = await supabase
       .from('storyboard_scenes')
       .insert({
@@ -223,7 +223,7 @@ export default function StoryboardPhase() {
       ids.map((id) => {
         const s = scenes.find((x) => x.id === id);
         if (!s) return Promise.resolve({ id, ok: true });
-        return scenesApi.update(id, pickEditable(s)).then((r) => ({ id, ok: !r.error, err: r.error }));
+        return scenesApi.update(id, pickEditableSafe(s)).then((r) => ({ id, ok: !r.error, err: r.error }));
       })
     );
     setSavingAll(false);
