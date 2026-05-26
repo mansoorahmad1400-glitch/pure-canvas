@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import AppLayout from '@/components/layout/AppLayout';
 import RequireAuth from '@/components/auth/RequireAuth';
+import RouteErrorBoundary from '@/components/RouteErrorBoundary';
 import InitUserGems from '@/components/auth/InitUserGems';
 // REQUIRED platform imports — do NOT remove or rename
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -30,6 +31,7 @@ function lazyWithRetry(factory) {
 }
 
 const Home          = lazyWithRetry(() => import('@/pages/Home'));
+const RootRedirect  = lazyWithRetry(() => import('@/pages/RootRedirect'));
 const Projects      = lazyWithRetry(() => import('@/pages/Projects'));
 const ViewBlueprint = lazyWithRetry(() => import('@/pages/ViewBlueprint'));
 const Upgrade       = lazyWithRetry(() => import('@/pages/Upgrade'));
@@ -107,10 +109,11 @@ function AnimatedRoutes() {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait" initial={false}>
+      <RouteErrorBoundary resetKey={location.pathname}>
       <Routes location={location} key={location.pathname}>
         <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
         <Route element={<AppLayout />}>
-          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/" element={<PageTransition><RootRedirect /></PageTransition>} />
           <Route path="/upgrade" element={<PageTransition><Upgrade /></PageTransition>} />
           <Route path="/studio" element={<Navigate to="/projects" replace />} />
           <Route path="/studio/legacy" element={<PageTransition><RequireAuth><Dashboard /></RequireAuth></PageTransition>} />
@@ -140,6 +143,7 @@ function AnimatedRoutes() {
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
+      </RouteErrorBoundary>
     </AnimatePresence>
   );
 }
