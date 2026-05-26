@@ -144,8 +144,7 @@ function AnimatedRoutes() {
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-      </RouteErrorBoundary>
-    </AnimatePresence>
+    </RouteErrorBoundary>
   );
 }
 
