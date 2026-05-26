@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/integrations/supabase/client';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 // Gem init rules:
@@ -68,7 +68,7 @@ export default function InitUserGems() {
     }
 
     if (Object.keys(updates).length > 0) {
-      base44.auth.updateMe(updates).then(refetch);
+      supabase.from('User').update(updates).eq('created_by_id', user.id).then(() => refetch());
     }
   }, [user?.id, user?.role, user?.gems_reset_date]);
 

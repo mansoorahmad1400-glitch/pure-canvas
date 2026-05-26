@@ -3,7 +3,7 @@ import { Home, FolderOpen, Sparkles, Gem, Crown, LogOut, LogIn, ChevronDown, Set
 import { motion } from 'framer-motion';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -35,13 +35,14 @@ export default function AppLayout() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     queryClient.clear();
-    base44.auth.logout();
+    try { await supabase.auth.signOut(); } catch {}
+    window.location.href = '/login';
   };
 
   const handleLogin = () => {
-    base44.auth.redirectToLogin();
+    window.location.href = '/login';
   };
 
   const bottomTabs = [
