@@ -88,7 +88,7 @@ export default function Home() {
           >
             {user ? (
               <>
-                <Link to="/studio">
+                <Link to="/projects/new">
                   <Button size="lg" className="h-12 px-8 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl">
                     <Sparkles className="w-5 h-5 mr-2" /> {t('home.startCreating')}
                   </Button>
@@ -320,7 +320,7 @@ export default function Home() {
               </ul>
               <div className="mt-5">
                 {isPremium ? (
-                  <Link to="/studio"><Button className="w-full bg-purple-400 hover:bg-purple-500 text-purple-950 font-bold h-12 text-sm rounded-lg transition-colors"><Sparkles className="w-4 h-4 mr-2" /> {t('home.plans.openStudio')}</Button></Link>
+                  <Link to="/projects/new"><Button className="w-full bg-purple-400 hover:bg-purple-500 text-purple-950 font-bold h-12 text-sm rounded-lg transition-colors"><Sparkles className="w-4 h-4 mr-2" /> {t('home.plans.openStudio')}</Button></Link>
                 ) : (
                   <Link to="/upgrade"><Button className="w-full bg-purple-400 hover:bg-purple-500 text-purple-950 font-bold h-12 text-sm rounded-lg transition-colors"><Sparkles className="w-4 h-4 mr-2" /> {t('home.plans.upgradeToPro')}</Button></Link>
                 )}
@@ -355,7 +355,7 @@ export default function Home() {
               </ul>
               <div className="mt-5">
                 {isElite ? (
-                  <Link to="/studio"><Button className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold h-12 text-sm rounded-lg transition-colors"><Sparkles className="w-4 h-4 mr-2" /> {t('home.plans.openStudio')}</Button></Link>
+                  <Link to="/projects/new"><Button className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold h-12 text-sm rounded-lg transition-colors"><Sparkles className="w-4 h-4 mr-2" /> {t('home.plans.openStudio')}</Button></Link>
                 ) : (
                   <Link to="/upgrade"><Button className="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold h-12 text-sm rounded-lg transition-colors"><Crown className="w-4 h-4 mr-2" /> {t('home.plans.upgradeToElite')}</Button></Link>
                 )}
@@ -384,7 +384,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             {user ? (
               <>
-                <Link to="/studio">
+                <Link to="/projects/new">
                   <Button size="lg" className="h-12 px-10 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/20">
                     <Sparkles className="w-5 h-5 mr-2" /> {t('home.plans.openStudio')}
                   </Button>
