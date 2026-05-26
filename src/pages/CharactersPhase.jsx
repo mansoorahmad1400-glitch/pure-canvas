@@ -8,6 +8,8 @@ import { projectsApi, scenesApi, charactersApi } from '@/lib/studio/api';
 import { supabase } from '@/integrations/supabase/client';
 import { extractCharacters, defaultStyleFor } from '@/lib/studio/characterExtractor';
 import CharacterEditorCard, { canApproveCharacter } from '@/components/characters/CharacterEditorCard';
+import { useAuthReady } from '@/hooks/useAuthReady';
+import QueryErrorState from '@/components/studio/QueryErrorState';
 
 const EDITABLE_FIELDS = [
   'name', 'role', 'description', 'appearance', 'personality',
@@ -24,23 +26,36 @@ export default function CharactersPhase() {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isReady } = useAuthReady();
 
   const projectQ = useQuery({
-    queryKey: ['project', projectId],
-    queryFn: async () => (await projectsApi.get(projectId)).data,
-    enabled: !!projectId,
+    queryKey: ['project', projectId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await projectsApi.get(projectId);
+      if (error) throw error;
+      return data;
+    },
+    enabled: isReady && !!user && !!projectId,
   });
 
   const scenesQ = useQuery({
-    queryKey: ['storyboard-scenes', projectId],
-    queryFn: async () => (await scenesApi.listByProject(projectId)).data ?? [],
-    enabled: !!projectId,
+    queryKey: ['storyboard-scenes', projectId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await scenesApi.listByProject(projectId);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: isReady && !!user && !!projectId,
   });
 
   const charactersQ = useQuery({
-    queryKey: ['characters', projectId],
-    queryFn: async () => (await charactersApi.listByProject(projectId)).data ?? [],
-    enabled: !!projectId,
+    queryKey: ['characters', projectId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await charactersApi.listByProject(projectId);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: isReady && !!user && !!projectId,
   });
 
   const [characters, setCharacters] = useState([]);
