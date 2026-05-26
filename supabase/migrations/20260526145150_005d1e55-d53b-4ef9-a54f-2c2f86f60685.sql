@@ -1,0 +1,1 @@
+ALTER TABLE public.final_exports ADD COLUMN IF NOT EXISTS export_manifest jsonb;

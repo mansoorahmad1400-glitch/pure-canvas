@@ -257,6 +257,7 @@ export type Database = {
         Row: {
           approved_scene_ids: string[] | null
           created_at: string
+          export_manifest: Json | null
           final_video_url: string | null
           id: string
           preview_video_url: string | null
@@ -269,6 +270,7 @@ export type Database = {
         Insert: {
           approved_scene_ids?: string[] | null
           created_at?: string
+          export_manifest?: Json | null
           final_video_url?: string | null
           id?: string
           preview_video_url?: string | null
@@ -281,6 +283,7 @@ export type Database = {
         Update: {
           approved_scene_ids?: string[] | null
           created_at?: string
+          export_manifest?: Json | null
           final_video_url?: string | null
           id?: string
           preview_video_url?: string | null
