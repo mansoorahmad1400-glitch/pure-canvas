@@ -284,6 +284,23 @@ function SceneImageCard({
               </div>
             )}
 
+            <AssetUploadButton
+              projectId={projectId}
+              kind="image"
+              sceneId={scene.id}
+              assetRole="scene_image"
+              label="Upload Image"
+              onUploaded={async ({ publicUrl }) => {
+                await onSaveRecord({
+                  scene_id: scene.id,
+                  prompt_used: prompt,
+                  image_url: publicUrl,
+                  provider: 'manual_upload',
+                });
+                setImageUrl(publicUrl);
+              }}
+            />
+
             <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs"
               disabled={busy === 'mock'} onClick={addMock}>
               {busy === 'mock' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
