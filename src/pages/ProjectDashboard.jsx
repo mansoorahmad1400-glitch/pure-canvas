@@ -67,40 +67,30 @@ export default function ProjectDashboard() {
   const project = projectQ.data;
   const isLoading = projectQ.isLoading;
 
-  const countsQ = useQuery({
-    queryKey: ['project-phase-counts', id, user?.id],
+  const summaryQ = useQuery({
+    queryKey: ['project-phase-summary', id, user?.id],
     queryFn: async () => {
-      const [s, c, im, vd, au, ex] = await Promise.all([
-        scenesApi.listByProject(id),
-        charactersApi.listByProject(id),
-        sceneImagesApi.listByProject(id),
-        sceneVideosApi.listByProject(id),
-        audioAssetsApi.listByProject(id),
-        exportsApi.latest(id),
-      ]);
-      return {
-        scenes: s.data ?? [],
-        characters: c.data ?? [],
-        images: im.data ?? [],
-        videos: vd.data ?? [],
-        audio: au.data ?? [],
-        exportRow: ex.data ?? null,
-      };
+      const result = await getProjectPhaseSummary(id);
+      return result.summary;
     },
     enabled: isReady && !!user && !!id,
+    refetchOnWindowFocus: true,
   });
-  const counts = countsQ.data;
+  const summary = summaryQ.data;
 
-  const phaseStatus = useMemo(() => {
-    if (!counts) return {};
-    return computePhaseStatus(counts);
-  }, [counts]);
+  // Best-effort sync computed status back to the projects row so the My
+  // Projects list reflects the latest state without manual edits.
+  useEffect(() => {
+    if (!project || !summary) return;
+    syncProjectSummary(id, summary, project);
+  }, [id, project, summary]);
 
-  const completedIds = PHASES.filter((p) => phaseStatus[p.id]).map((p) => p.id);
-  const progressPct = Math.round((completedIds.length / PHASES.length) * 100);
-  const nextIncomplete = PHASES.find((p) => !phaseStatus[p.id]) ?? PHASES[PHASES.length - 1];
-  const currentPhaseId = nextIncomplete.id;
-  const currentPhase = PHASES.find((p) => p.id === currentPhaseId);
+  const phaseStatus = summary?.phases ?? {};
+  const progressPct = summary?.progress ?? 0;
+  const currentPhaseId = (summary?.currentPhase && summary.currentPhase !== 'complete')
+    ? summary.currentPhase
+    : 'export';
+  const currentPhase = PHASES.find((p) => p.id === currentPhaseId) ?? PHASES[PHASES.length - 1];
 
   if (!isReady || isLoading) {
     return (
