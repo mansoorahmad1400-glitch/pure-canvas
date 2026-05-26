@@ -140,6 +140,11 @@ function SceneVideoCard({
   };
 
   const addMock = async () => {
+    if (!confirm(
+      `Generate a mock video placeholder for Scene ${scene.scene_number}?\n\n` +
+      `This attaches a single placeholder to this scene only. ` +
+      `No external API is called and no other scene is affected.`
+    )) return;
     setBusy('mock');
     try {
       await onSaveRecord({
