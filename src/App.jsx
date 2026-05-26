@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import AppLayout from '@/components/layout/AppLayout';
 import RequireAuth from '@/components/auth/RequireAuth';
+import RouteErrorBoundary from '@/components/RouteErrorBoundary';
 import InitUserGems from '@/components/auth/InitUserGems';
 // REQUIRED platform imports — do NOT remove or rename
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -142,6 +143,7 @@ function AnimatedRoutes() {
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
+      </RouteErrorBoundary>
     </AnimatePresence>
   );
 }
