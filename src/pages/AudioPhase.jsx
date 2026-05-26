@@ -310,6 +310,23 @@ function SceneAudioCard({ scene, video, sceneAssets, projectId, onAddAsset, onAp
                         Mock
                       </Button>
                     </div>
+                    <AssetUploadButton
+                      projectId={projectId}
+                      kind="audio"
+                      sceneId={scene.id}
+                      assetRole={type}
+                      label={`Upload ${type === 'rhyme_song' ? 'Song' : type}`}
+                      className="h-7 gap-1 text-[11px] w-full"
+                      onUploaded={({ publicUrl, asset }) => onAddAsset({
+                        scene_id: scene.id,
+                        asset_type: type,
+                        provider: 'manual_upload',
+                        audio_url: publicUrl,
+                        prompt_used: promptFor(type),
+                        duration: asset?.duration_seconds ?? scene.duration_seconds ?? 6,
+                        approval_status: 'draft',
+                      })}
+                    />
                     {urlMode === type && (
                       <div className="flex gap-1">
                         <Input value={urlInput} onChange={(e) => setUrlInput(e.target.value)}
