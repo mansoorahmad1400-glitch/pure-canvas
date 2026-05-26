@@ -120,6 +120,7 @@ function AnimatedRoutes() {
           <Route path="/project/:id/storyboard" element={<PageTransition><RequireAuth><StoryboardPhase /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/characters" element={<PageTransition><RequireAuth><CharactersPhase /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/images" element={<PageTransition><RequireAuth><ImagesPhase /></RequireAuth></PageTransition>} />
+          <Route path="/project/:id/animate" element={<PageTransition><RequireAuth><AnimatePhase /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/:phase" element={<PageTransition><RequireAuth><PhasePlaceholder /></RequireAuth></PageTransition>} />
           <Route path="/account" element={<PageTransition><RequireAuth><Account /></RequireAuth></PageTransition>} />
           <Route path="/admin" element={<PageTransition><RequireAuth><Admin /></RequireAuth></PageTransition>} />
