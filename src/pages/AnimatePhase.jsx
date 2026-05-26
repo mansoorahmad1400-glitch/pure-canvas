@@ -582,6 +582,7 @@ export default function AnimatePhase() {
                 image={approvedImageByScene.get(scene.id)}
                 record={videoByScene.get(scene.id)}
                 project={project}
+                projectId={projectId}
                 onSaveRecord={upsertRecord}
                 onApprove={approve}
                 onUnapprove={unapprove}
