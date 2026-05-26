@@ -30,6 +30,7 @@ const ProjectDashboard  = lazy(() => import('@/pages/ProjectDashboard'));
 const PhasePlaceholder  = lazy(() => import('@/pages/PhasePlaceholder'));
 const StoryboardPhase   = lazy(() => import('@/pages/StoryboardPhase'));
 const CharactersPhase   = lazy(() => import('@/pages/CharactersPhase'));
+const NewProjectV2      = lazy(() => import('@/pages/NewProjectV2'));
 const Login             = lazy(() => import('@/pages/Login'));
 
 function PageLoader() {
@@ -92,6 +93,7 @@ function AnimatedRoutes() {
           <Route path="/upgrade" element={<PageTransition><Upgrade /></PageTransition>} />
           <Route path="/studio" element={<PageTransition><RequireAuth><Dashboard /></RequireAuth></PageTransition>} />
           <Route path="/projects" element={<PageTransition><RequireAuth><Projects /></RequireAuth></PageTransition>} />
+          <Route path="/projects/new" element={<PageTransition><RequireAuth><NewProjectV2 /></RequireAuth></PageTransition>} />
           <Route path="/project/:id" element={<PageTransition><RequireAuth><ProjectDashboard /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/legacy" element={<PageTransition><RequireAuth><ProductionStudio /></RequireAuth></PageTransition>} />
           <Route path="/project/:id/advanced" element={<PageTransition><RequireAuth><ViewBlueprint /></RequireAuth></PageTransition>} />
