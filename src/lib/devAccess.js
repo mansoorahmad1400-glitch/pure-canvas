@@ -38,3 +38,14 @@ export async function canAccessPhase(/* phaseId */) {
   const { data: { user } } = await supabase.auth.getUser();
   return !!user;
 }
+
+export async function canBypassCredits() {
+  if (DEV_MODE) return true;
+  return await isAdminUser();
+}
+
+export async function canUseTestingTools() {
+  if (DEV_MODE) return true;
+  return await isAdminUser();
+}
+
