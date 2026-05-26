@@ -13,6 +13,8 @@ import {
   sceneVideosApi, audioAssetsApi, exportsApi,
 } from '@/lib/studio/api';
 import PhaseCard from '@/components/studio/PhaseCard';
+import { useAuthReady } from '@/hooks/useAuthReady';
+import QueryErrorState from '@/components/studio/QueryErrorState';
 
 export const PHASES = [
   {
@@ -71,18 +73,22 @@ export function computePhaseStatus({ scenes, characters, images, videos, audio, 
 export default function ProjectDashboard() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, isReady } = useAuthReady();
 
-  const { data: project, isLoading } = useQuery({
-    queryKey: ['project', id],
+  const projectQ = useQuery({
+    queryKey: ['project', id, user?.id],
     queryFn: async () => {
       const { data, error } = await projectsApi.get(id);
       if (error) throw error;
       return data;
     },
+    enabled: isReady && !!user && !!id,
   });
+  const project = projectQ.data;
+  const isLoading = projectQ.isLoading;
 
-  const { data: counts } = useQuery({
-    queryKey: ['project-phase-counts', id],
+  const countsQ = useQuery({
+    queryKey: ['project-phase-counts', id, user?.id],
     queryFn: async () => {
       const [s, c, im, vd, au, ex] = await Promise.all([
         scenesApi.listByProject(id),
@@ -101,8 +107,9 @@ export default function ProjectDashboard() {
         exportRow: ex.data ?? null,
       };
     },
-    enabled: !!id,
+    enabled: isReady && !!user && !!id,
   });
+  const counts = countsQ.data;
 
   const phaseStatus = useMemo(() => {
     if (!counts) return {};
@@ -115,10 +122,34 @@ export default function ProjectDashboard() {
   const currentPhaseId = nextIncomplete.id;
   const currentPhase = PHASES.find((p) => p.id === currentPhaseId);
 
-  if (isLoading || !project) {
+  if (!isReady || isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (projectQ.isError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <QueryErrorState
+          title="Couldn't load this project"
+          error={projectQ.error}
+          onRetry={() => projectQ.refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <QueryErrorState
+          title="Project not found"
+          error={{ message: 'This project no longer exists or you do not have access to it.' }}
+          onRetry={() => navigate('/projects')}
+        />
       </div>
     );
   }

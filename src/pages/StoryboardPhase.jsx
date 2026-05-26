@@ -197,53 +197,88 @@ export default function StoryboardPhase() {
     const s = scenes.find((x) => x.id === id);
     if (!s) return;
     const isApproved = s.visual_status === 'approved' && s.audio_status === 'approved';
-    if (isApproved) {
-      updateLocal(id, { visual_status: 'ready', audio_status: 'ready' });
-    } else {
-      if (!canApprove(s).ok) return;
-      updateLocal(id, { visual_status: 'approved', audio_status: 'approved' });
+    if (!isApproved) {
+      const check = canApprove(s);
+      if (!check.ok) {
+        toast({
+          title: 'Cannot approve scene yet',
+          description: !check.visualOk
+            ? 'Add a story or image prompt in the Visual section first.'
+            : 'Add dialogue, narration, lyrics, music or SFX in the Audio section first.',
+          variant: 'destructive',
+        });
+        return;
+      }
     }
-    // Persist approval immediately
     const patch = isApproved
       ? { visual_status: 'ready', audio_status: 'ready' }
       : { visual_status: 'approved', audio_status: 'approved' };
-    await scenesApi.update(id, patch);
-    setDirtyIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
-    flashSaved([id]);
+    // optimistic
+    const prevSnapshot = { visual_status: s.visual_status, audio_status: s.audio_status };
+    setScenes((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+    try {
+      const { error } = await scenesApi.update(id, patch);
+      if (error) throw error;
+      setDirtyIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
+      flashSaved([id]);
+      toast({
+        title: isApproved
+          ? `Scene ${s.scene_number} unapproved`
+          : `Scene ${s.scene_number} approved`,
+      });
+    } catch (err) {
+      // rollback
+      setScenes((prev) => prev.map((x) => (x.id === id ? { ...x, ...prevSnapshot } : x)));
+      toast({
+        title: 'Could not update approval',
+        description: err?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const saveAll = async () => {
     if (dirtyIds.size === 0) {
-      toast({ title: 'Nothing to save' });
+      toast({ title: 'No unsaved changes' });
       return;
     }
     setSavingAll(true);
     const ids = Array.from(dirtyIds);
-    const results = await Promise.all(
-      ids.map((id) => {
-        const s = scenes.find((x) => x.id === id);
-        if (!s) return Promise.resolve({ id, ok: true });
-        return scenesApi.update(id, pickEditableSafe(s)).then((r) => ({ id, ok: !r.error, err: r.error }));
-      })
-    );
-    setSavingAll(false);
-    const failed = results.filter((r) => !r.ok);
-    if (failed.length) {
+    try {
+      const results = await Promise.all(
+        ids.map((id) => {
+          const s = scenes.find((x) => x.id === id);
+          if (!s) return Promise.resolve({ id, ok: true });
+          return scenesApi.update(id, pickEditableSafe(s))
+            .then((r) => ({ id, ok: !r.error, err: r.error }));
+        })
+      );
+      const failed = results.filter((r) => !r.ok);
+      if (failed.length) {
+        toast({
+          title: `Saved ${results.length - failed.length}/${results.length}`,
+          description: failed[0]?.err?.message || 'Some scenes failed to save',
+          variant: 'destructive',
+        });
+      } else {
+        toast({ title: `Saved ${results.length} scene${results.length === 1 ? '' : 's'}` });
+      }
+      const okIds = results.filter((r) => r.ok).map((r) => r.id);
+      flashSaved(okIds);
+      setDirtyIds((prev) => {
+        const next = new Set(prev);
+        okIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } catch (err) {
       toast({
-        title: `Saved ${results.length - failed.length}/${results.length}`,
-        description: failed[0]?.err?.message || 'Some scenes failed to save',
+        title: 'Save failed',
+        description: err?.message || 'Network error. Please try again.',
         variant: 'destructive',
       });
-    } else {
-      toast({ title: `Saved ${results.length} scene${results.length === 1 ? '' : 's'}` });
+    } finally {
+      setSavingAll(false);
     }
-    const okIds = results.filter((r) => r.ok).map((r) => r.id);
-    flashSaved(okIds);
-    setDirtyIds((prev) => {
-      const next = new Set(prev);
-      okIds.forEach((id) => next.delete(id));
-      return next;
-    });
   };
 
   // Warn on unload with unsaved changes
@@ -306,9 +341,15 @@ export default function StoryboardPhase() {
           <Button size="sm" variant="outline" onClick={addScene} className="gap-1.5">
             <Plus className="w-4 h-4" /> Add Scene
           </Button>
-          <Button size="sm" onClick={saveAll} disabled={savingAll || dirtyIds.size === 0} className="gap-1.5">
+          <Button
+            size="sm"
+            onClick={saveAll}
+            disabled={savingAll || dirtyIds.size === 0}
+            title={dirtyIds.size === 0 ? 'No unsaved changes' : `Save ${dirtyIds.size} change${dirtyIds.size === 1 ? '' : 's'}`}
+            className="gap-1.5"
+          >
             {savingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save All {dirtyIds.size > 0 && `(${dirtyIds.size})`}
+            {savingAll ? 'Saving…' : 'Save All'} {dirtyIds.size > 0 && `(${dirtyIds.size})`}
           </Button>
         </div>
       </div>

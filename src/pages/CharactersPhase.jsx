@@ -8,6 +8,8 @@ import { projectsApi, scenesApi, charactersApi } from '@/lib/studio/api';
 import { supabase } from '@/integrations/supabase/client';
 import { extractCharacters, defaultStyleFor } from '@/lib/studio/characterExtractor';
 import CharacterEditorCard, { canApproveCharacter } from '@/components/characters/CharacterEditorCard';
+import { useAuthReady } from '@/hooks/useAuthReady';
+import QueryErrorState from '@/components/studio/QueryErrorState';
 
 const EDITABLE_FIELDS = [
   'name', 'role', 'description', 'appearance', 'personality',
@@ -24,23 +26,36 @@ export default function CharactersPhase() {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isReady } = useAuthReady();
 
   const projectQ = useQuery({
-    queryKey: ['project', projectId],
-    queryFn: async () => (await projectsApi.get(projectId)).data,
-    enabled: !!projectId,
+    queryKey: ['project', projectId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await projectsApi.get(projectId);
+      if (error) throw error;
+      return data;
+    },
+    enabled: isReady && !!user && !!projectId,
   });
 
   const scenesQ = useQuery({
-    queryKey: ['storyboard-scenes', projectId],
-    queryFn: async () => (await scenesApi.listByProject(projectId)).data ?? [],
-    enabled: !!projectId,
+    queryKey: ['storyboard-scenes', projectId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await scenesApi.listByProject(projectId);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: isReady && !!user && !!projectId,
   });
 
   const charactersQ = useQuery({
-    queryKey: ['characters', projectId],
-    queryFn: async () => (await charactersApi.listByProject(projectId)).data ?? [],
-    enabled: !!projectId,
+    queryKey: ['characters', projectId, user?.id],
+    queryFn: async () => {
+      const { data, error } = await charactersApi.listByProject(projectId);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: isReady && !!user && !!projectId,
   });
 
   const [characters, setCharacters] = useState([]);
@@ -110,7 +125,23 @@ export default function CharactersPhase() {
   const handleExtract = async () => {
     setExtracting(true);
     try {
-      const scenes = scenesQ.data ?? [];
+      // Ensure we have the latest scenes
+      let scenes = scenesQ.data;
+      if (!scenes) {
+        const refetched = await scenesQ.refetch();
+        scenes = refetched.data ?? [];
+      }
+      const approvedScenes = scenes.filter(
+        (s) => s.visual_status === 'approved' && s.audio_status === 'approved'
+      );
+      if (approvedScenes.length === 0) {
+        toast({
+          title: 'No approved scenes yet',
+          description: 'Approve at least one Storyboard scene before extracting characters.',
+          variant: 'destructive',
+        });
+        return;
+      }
       const candidates = extractCharacters({
         scenes,
         projectType: project?.project_type,
@@ -119,9 +150,8 @@ export default function CharactersPhase() {
       if (candidates.length === 0) {
         toast({
           title: 'Nothing new to extract',
-          description: 'Approve more storyboard scenes or add character names there first.',
+          description: 'All detected characters are already in your list.',
         });
-        setExtracting(false);
         return;
       }
       let added = 0;
@@ -130,13 +160,24 @@ export default function CharactersPhase() {
         try {
           await insertCharacter({ project_id: projectId, ...payload });
           added++;
-        } catch { /* skip individual failures */ }
+        } catch (err) {
+          console.error('Character insert failed', err);
+        }
       }
-      toast({ title: `Extracted ${added} character${added === 1 ? '' : 's'}`, description: 'Review and approve them below.' });
+      toast({
+        title: `Extracted ${added} character${added === 1 ? '' : 's'}`,
+        description: 'Review and approve them below.',
+      });
     } catch (e) {
-      toast({ title: 'Extraction failed', description: e.message, variant: 'destructive' });
+      console.error('Extraction error', e);
+      toast({
+        title: 'Extraction failed',
+        description: e?.message || 'Unexpected error. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setExtracting(false);
     }
-    setExtracting(false);
   };
 
   const handleDelete = async (id) => {
@@ -190,26 +231,41 @@ export default function CharactersPhase() {
   };
 
   const handleSaveAll = async () => {
-    if (dirtyIds.size === 0) return;
+    if (dirtyIds.size === 0) {
+      toast({ title: 'No unsaved changes' });
+      return;
+    }
     setSavingAll(true);
     const ids = Array.from(dirtyIds);
     const targets = characters.filter((c) => ids.includes(c.id));
-    const results = await Promise.allSettled(
-      targets.map((c) => charactersApi.update(c.id, pickEditable(c)))
-    );
-    const okIds = [];
-    let failed = 0;
-    results.forEach((r, i) => {
-      if (r.status === 'fulfilled' && !r.value.error) okIds.push(targets[i].id);
-      else failed++;
-    });
-    clearDirty(okIds);
-    flashSaved(okIds);
-    setSavingAll(false);
-    toast({
-      title: failed ? `Saved ${okIds.length}, ${failed} failed` : `Saved ${okIds.length} character${okIds.length === 1 ? '' : 's'}`,
-      variant: failed ? 'destructive' : 'default',
-    });
+    try {
+      const results = await Promise.allSettled(
+        targets.map((c) => charactersApi.update(c.id, pickEditable(c)))
+      );
+      const okIds = [];
+      let failed = 0;
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled' && !r.value.error) okIds.push(targets[i].id);
+        else failed++;
+      });
+      clearDirty(okIds);
+      flashSaved(okIds);
+      toast({
+        title: failed
+          ? `Saved ${okIds.length}, ${failed} failed`
+          : `Saved ${okIds.length} character${okIds.length === 1 ? '' : 's'}`,
+        variant: failed ? 'destructive' : 'default',
+      });
+    } catch (err) {
+      console.error('Save all failed', err);
+      toast({
+        title: 'Save failed',
+        description: err?.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingAll(false);
+    }
   };
 
   const goBack = () => {
@@ -217,10 +273,31 @@ export default function CharactersPhase() {
     navigate(`/project/${projectId}`);
   };
 
-  if (projectQ.isLoading || charactersQ.isLoading) {
+  const showInitialLoader =
+    !isReady ||
+    (projectQ.isLoading && !projectQ.data) ||
+    (charactersQ.isLoading && !charactersQ.data);
+
+  if (showInitialLoader) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (projectQ.isError || charactersQ.isError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <QueryErrorState
+          title="Couldn't load characters"
+          error={projectQ.error || charactersQ.error}
+          onRetry={() => {
+            projectQ.refetch();
+            charactersQ.refetch();
+            scenesQ.refetch();
+          }}
+        />
       </div>
     );
   }

@@ -17,6 +17,8 @@ import {
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { projectsApi } from '@/lib/studio/api';
+import { useAuthReady } from '@/hooks/useAuthReady';
+import QueryErrorState from '@/components/studio/QueryErrorState';
 
 const statusConfig = {
   draft:      { icon: Clock,        label: 'Draft',      cls: 'bg-muted text-muted-foreground' },
@@ -90,27 +92,36 @@ function ProjectCard({ project, onDelete }) {
 export default function Projects() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { user, isReady } = useAuthReady();
   const [pendingDelete, setPendingDelete] = useState(null);
 
-  const { data: projects = [], isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['projects-v2'],
-    queryFn: async () => (await projectsApi.list()).data ?? [],
+  const { data: projects = [], isLoading, isError, error, refetch, isFetching } = useQuery({
+    queryKey: ['projects-v2', user?.id],
+    queryFn: async () => {
+      const { data, error } = await projectsApi.list();
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: isReady && !!user,
   });
 
   const handleDelete = async () => {
     if (!pendingDelete) return;
     const id = pendingDelete.id;
     setPendingDelete(null);
-    const snap = queryClient.getQueryData(['projects-v2']);
-    queryClient.setQueryData(['projects-v2'], (old) => (old ?? []).filter((p) => p.id !== id));
+    const key = ['projects-v2', user?.id];
+    const snap = queryClient.getQueryData(key);
+    queryClient.setQueryData(key, (old) => (old ?? []).filter((p) => p.id !== id));
     const { error } = await projectsApi.remove(id);
     if (error) {
-      queryClient.setQueryData(['projects-v2'], snap);
+      queryClient.setQueryData(key, snap);
       toast.error('Failed to delete project');
     } else {
       toast.success('Project deleted');
     }
   };
+
+  const showInitialLoader = !isReady || (isLoading && !isError);
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
@@ -142,10 +153,16 @@ export default function Projects() {
           </div>
         </div>
 
-        {isLoading ? (
+        {showInitialLoader ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
+        ) : isError ? (
+          <QueryErrorState
+            title="Couldn't load your projects"
+            error={error}
+            onRetry={() => refetch()}
+          />
         ) : projects.length === 0 ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
             <FolderOpen className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
