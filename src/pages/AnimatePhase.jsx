@@ -16,6 +16,7 @@ import { defaultStyleFor } from '@/lib/studio/characterExtractor';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
 import AssetUploadButton from '@/components/studio/AssetUploadButton';
+import AssetLibraryPicker from '@/components/studio/AssetLibraryPicker';
 
 const MOCK_VIDEO_URL =
   'https://placehold.co/1280x720/0f172a/e2e8f0?text=Scene+Video+(Mock)';
@@ -281,6 +282,23 @@ function SceneVideoCard({
                   video_url: publicUrl,
                   provider: 'manual_upload',
                   duration_seconds: scene.duration_seconds ?? 6,
+                });
+              }}
+            />
+
+            <AssetLibraryPicker
+              projectId={projectId}
+              kind="video"
+              assetRole="scene_video"
+              label="Pick from Library"
+              onPick={async ({ publicUrl, asset }) => {
+                await onSaveRecord({
+                  scene_id: scene.id,
+                  image_id: image.id,
+                  prompt_used: prompt,
+                  video_url: publicUrl,
+                  provider: 'manual_upload',
+                  duration_seconds: asset?.duration_seconds ?? scene.duration_seconds ?? 6,
                 });
               }}
             />

@@ -14,6 +14,7 @@ import {
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
 import AssetUploadButton from '@/components/studio/AssetUploadButton';
+import AssetLibraryPicker from '@/components/studio/AssetLibraryPicker';
 
 // Mock placeholder audio URL — short open-source bell tone, useful for testing
 // pipeline gating without calling paid TTS/music providers.
@@ -318,6 +319,22 @@ function SceneAudioCard({ scene, video, sceneAssets, projectId, onAddAsset, onAp
                       label={`Upload ${type === 'rhyme_song' ? 'Song' : type}`}
                       className="h-7 gap-1 text-[11px] w-full"
                       onUploaded={({ publicUrl, asset }) => onAddAsset({
+                        scene_id: scene.id,
+                        asset_type: type,
+                        provider: 'manual_upload',
+                        audio_url: publicUrl,
+                        prompt_used: promptFor(type),
+                        duration: asset?.duration_seconds ?? scene.duration_seconds ?? 6,
+                        approval_status: 'draft',
+                      })}
+                    />
+                    <AssetLibraryPicker
+                      projectId={projectId}
+                      kind="audio"
+                      assetRole={type}
+                      label="Pick from Library"
+                      className="h-7 gap-1 text-[11px] w-full"
+                      onPick={({ publicUrl, asset }) => onAddAsset({
                         scene_id: scene.id,
                         asset_type: type,
                         provider: 'manual_upload',
