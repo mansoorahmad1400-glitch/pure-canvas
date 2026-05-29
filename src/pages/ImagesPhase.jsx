@@ -16,6 +16,7 @@ import { defaultStyleFor } from '@/lib/studio/characterExtractor';
 import { useAuthReady } from '@/hooks/useAuthReady';
 import QueryErrorState from '@/components/studio/QueryErrorState';
 import AssetUploadButton from '@/components/studio/AssetUploadButton';
+import AssetLibraryPicker from '@/components/studio/AssetLibraryPicker';
 
 // ---------- helpers ----------
 function buildDefaultPrompt({ scene, project, characters }) {
@@ -291,6 +292,22 @@ function SceneImageCard({
               assetRole="scene_image"
               label="Upload Image"
               onUploaded={async ({ publicUrl }) => {
+                await onSaveRecord({
+                  scene_id: scene.id,
+                  prompt_used: prompt,
+                  image_url: publicUrl,
+                  provider: 'manual_upload',
+                });
+                setImageUrl(publicUrl);
+              }}
+            />
+
+            <AssetLibraryPicker
+              projectId={projectId}
+              kind="image"
+              assetRole="scene_image"
+              label="Pick from Library"
+              onPick={async ({ publicUrl }) => {
                 await onSaveRecord({
                   scene_id: scene.id,
                   prompt_used: prompt,
