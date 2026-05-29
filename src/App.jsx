@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import AppLayout from '@/components/layout/AppLayout';
 import RequireAuth from '@/components/auth/RequireAuth';
@@ -13,15 +13,15 @@ import InitUserGems from '@/components/auth/InitUserGems';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
-// Retry-aware lazy: dynamic imports occasionally fail in dev (chunk fetch
-// races a Vite reload). Retry once after a short delay, then hard-reload.
+// Retry-aware lazy: dynamic imports occasionally fail in dev when Vite is
+// rebuilding. Retry once, then throw to RouteErrorBoundary instead of forcing
+// a page reload loop that can surface as "Preview has not been built yet".
 function lazyWithRetry(factory) {
   return lazy(() =>
     factory().catch((err) => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           factory().then(resolve).catch((err2) => {
-            if (typeof window !== 'undefined') window.location.reload();
             reject(err2 || err);
           });
         }, 400);
