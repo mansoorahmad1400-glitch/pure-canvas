@@ -23,6 +23,72 @@ function summarizeAudio(assets) {
   return [...types].join(' + ');
 }
 
+const VOICE_TYPES = new Set(['voice', 'voiceover', 'narration', 'dialogue']);
+const MUSIC_TYPES = new Set(['music', 'background_music', 'bgm']);
+const SFX_TYPES   = new Set(['sfx', 'sound_effect', 'sound_effects', 'ambience']);
+
+function classifyAudioRole(a) {
+  const t = String(a?.asset_type || '').toLowerCase();
+  if (VOICE_TYPES.has(t)) return 'voice';
+  if (MUSIC_TYPES.has(t)) return 'music';
+  if (SFX_TYPES.has(t))   return 'sfx';
+  return 'voice'; // default bucket
+}
+
+function buildSceneReadiness({ scenes, images, videos, audio }) {
+  const approvedImagesBy = new Map();
+  for (const i of images) {
+    if (i.approval_status === 'approved' && i.image_url && !approvedImagesBy.has(i.scene_id)) {
+      approvedImagesBy.set(i.scene_id, i);
+    }
+  }
+  const approvedVideosBy = new Map();
+  for (const v of videos) {
+    if (v.approval_status === 'approved' && v.video_url && !approvedVideosBy.has(v.scene_id)) {
+      approvedVideosBy.set(v.scene_id, v);
+    }
+  }
+  const audioByScene = new Map();
+  for (const a of audio) {
+    if (a.approval_status !== 'approved' || !a.audio_url || !a.scene_id) continue;
+    const arr = audioByScene.get(a.scene_id) ?? [];
+    arr.push(a);
+    audioByScene.set(a.scene_id, arr);
+  }
+
+  const sorted = [...scenes].sort((a, b) => (a.scene_number ?? 0) - (b.scene_number ?? 0));
+  return sorted
+    .filter((s) => s && s.id)
+    .map((s) => {
+      const img = approvedImagesBy.get(s.id) || null;
+      const vid = approvedVideosBy.get(s.id) || null;
+      const auds = audioByScene.get(s.id) ?? [];
+      const voice = auds.find((a) => classifyAudioRole(a) === 'voice') || null;
+      const music = auds.find((a) => classifyAudioRole(a) === 'music') || null;
+      const sfx   = auds.find((a) => classifyAudioRole(a) === 'sfx')   || null;
+      const isSilent = s.audio_mode === 'silent';
+      const hasAnyAudio = auds.length > 0;
+      const audioReady = isSilent || hasAnyAudio;
+      const ready = !!img && !!vid && audioReady;
+      return {
+        scene_id: s.id,
+        scene_number: s.scene_number,
+        scene_title: s.scene_title || `Scene ${s.scene_number}`,
+        duration_seconds: s.duration_seconds ?? 6,
+        audio_mode: s.audio_mode || 'layered',
+        image: img,
+        video: vid,
+        voice, music, sfx,
+        has_image: !!img,
+        has_video: !!vid,
+        has_audio: hasAnyAudio || isSilent,
+        is_silent: isSilent,
+        ready,
+      };
+    });
+}
+
+
 function buildTimeline({ scenes, images, videos, audio }) {
   const approvedImagesBy = new Map();
   for (const i of images) {
