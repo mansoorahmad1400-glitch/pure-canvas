@@ -1,0 +1,9 @@
+{
+  "name": "StudioOne AI",
+  "short_name": "StudioOne AI",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": []
+}
