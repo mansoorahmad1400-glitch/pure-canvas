@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, RefreshCw, Save, Send, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Loader2, Info } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Save, Send, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Loader2, Info, Image as ImageIcon, Film, Mic, Music, Volume2, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,72 @@ function summarizeAudio(assets) {
   if (types.size === 0) return 'audio';
   return [...types].join(' + ');
 }
+
+const VOICE_TYPES = new Set(['voice', 'voiceover', 'narration', 'dialogue']);
+const MUSIC_TYPES = new Set(['music', 'background_music', 'bgm']);
+const SFX_TYPES   = new Set(['sfx', 'sound_effect', 'sound_effects', 'ambience']);
+
+function classifyAudioRole(a) {
+  const t = String(a?.asset_type || '').toLowerCase();
+  if (VOICE_TYPES.has(t)) return 'voice';
+  if (MUSIC_TYPES.has(t)) return 'music';
+  if (SFX_TYPES.has(t))   return 'sfx';
+  return 'voice'; // default bucket
+}
+
+function buildSceneReadiness({ scenes, images, videos, audio }) {
+  const approvedImagesBy = new Map();
+  for (const i of images) {
+    if (i.approval_status === 'approved' && i.image_url && !approvedImagesBy.has(i.scene_id)) {
+      approvedImagesBy.set(i.scene_id, i);
+    }
+  }
+  const approvedVideosBy = new Map();
+  for (const v of videos) {
+    if (v.approval_status === 'approved' && v.video_url && !approvedVideosBy.has(v.scene_id)) {
+      approvedVideosBy.set(v.scene_id, v);
+    }
+  }
+  const audioByScene = new Map();
+  for (const a of audio) {
+    if (a.approval_status !== 'approved' || !a.audio_url || !a.scene_id) continue;
+    const arr = audioByScene.get(a.scene_id) ?? [];
+    arr.push(a);
+    audioByScene.set(a.scene_id, arr);
+  }
+
+  const sorted = [...scenes].sort((a, b) => (a.scene_number ?? 0) - (b.scene_number ?? 0));
+  return sorted
+    .filter((s) => s && s.id)
+    .map((s) => {
+      const img = approvedImagesBy.get(s.id) || null;
+      const vid = approvedVideosBy.get(s.id) || null;
+      const auds = audioByScene.get(s.id) ?? [];
+      const voice = auds.find((a) => classifyAudioRole(a) === 'voice') || null;
+      const music = auds.find((a) => classifyAudioRole(a) === 'music') || null;
+      const sfx   = auds.find((a) => classifyAudioRole(a) === 'sfx')   || null;
+      const isSilent = s.audio_mode === 'silent';
+      const hasAnyAudio = auds.length > 0;
+      const audioReady = isSilent || hasAnyAudio;
+      const ready = !!img && !!vid && audioReady;
+      return {
+        scene_id: s.id,
+        scene_number: s.scene_number,
+        scene_title: s.scene_title || `Scene ${s.scene_number}`,
+        duration_seconds: s.duration_seconds ?? 6,
+        audio_mode: s.audio_mode || 'layered',
+        image: img,
+        video: vid,
+        voice, music, sfx,
+        has_image: !!img,
+        has_video: !!vid,
+        has_audio: hasAnyAudio || isSilent,
+        is_silent: isSilent,
+        ready,
+      };
+    });
+}
+
 
 function buildTimeline({ scenes, images, videos, audio }) {
   const approvedImagesBy = new Map();
@@ -161,8 +227,31 @@ export default function ExportPhase() {
     return buildTimeline(dataQ.data);
   }, [dataQ.data]);
 
+  const sceneReadiness = useMemo(() => {
+    if (!dataQ.data) return [];
+    return buildSceneReadiness(dataQ.data);
+  }, [dataQ.data]);
+
+  const summary = useMemo(() => {
+    const total = sceneReadiness.length;
+    const ready = sceneReadiness.filter((s) => s.ready).length;
+    const missingImage = sceneReadiness.filter((s) => !s.has_image).length;
+    const missingVideo = sceneReadiness.filter((s) => !s.has_video).length;
+    const missingAudio = sceneReadiness.filter((s) => !s.has_audio).length;
+    return { total, ready, missingImage, missingVideo, missingAudio };
+  }, [sceneReadiness]);
+
+  const [readinessFilter, setReadinessFilter] = useState('all'); // all | ready | missing
+
+  const filteredReadiness = useMemo(() => {
+    if (readinessFilter === 'ready') return sceneReadiness.filter((s) => s.ready);
+    if (readinessFilter === 'missing') return sceneReadiness.filter((s) => !s.ready);
+    return sceneReadiness;
+  }, [sceneReadiness, readinessFilter]);
+
   const readiness = timeline.included.length > 0 ? 'ready' : 'not_ready';
   const statusFromExisting = dataQ.data?.existing?.status;
+
 
   const handleRefresh = async () => {
     await qc.invalidateQueries({ queryKey: ['export-phase', id] });
@@ -311,6 +400,139 @@ export default function ExportPhase() {
           )}
         </div>
       </Card>
+
+      {/* Export Readiness — scene by scene */}
+      <div>
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+          <h2 className="text-sm font-semibold text-foreground">Export Readiness</h2>
+          <div className="flex flex-wrap gap-1.5">
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/images`)}>
+              <ImageIcon className="w-3.5 h-3.5 mr-1" /> Images
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/animate`)}>
+              <Film className="w-3.5 h-3.5 mr-1" /> Animate
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/audio`)}>
+              <Volume2 className="w-3.5 h-3.5 mr-1" /> Audio
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/assets`)}>
+              <FolderOpen className="w-3.5 h-3.5 mr-1" /> Assets
+            </Button>
+          </div>
+        </div>
+
+        {/* Summary */}
+        <Card className="p-3 bg-card border-border mb-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+            <div><div className="text-lg font-semibold text-foreground">{summary.total}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">Scenes</div></div>
+            <div><div className="text-lg font-semibold text-primary">{summary.ready}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">Ready</div></div>
+            <div><div className="text-lg font-semibold text-amber-500">{summary.missingImage}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">No Image</div></div>
+            <div><div className="text-lg font-semibold text-amber-500">{summary.missingVideo}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">No Video</div></div>
+            <div><div className="text-lg font-semibold text-amber-500">{summary.missingAudio}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">No Audio</div></div>
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
+            <Badge
+              variant="outline"
+              className={summary.ready === summary.total && summary.total > 0
+                ? 'border-primary/40 text-primary'
+                : 'border-amber-500/40 text-amber-500'}
+            >
+              {summary.total > 0 && summary.ready === summary.total ? 'All scenes ready' : `${summary.ready}/${summary.total} ready`}
+            </Badge>
+            <div className="flex gap-1">
+              {['all', 'ready', 'missing'].map((f) => (
+                <Button
+                  key={f}
+                  size="sm"
+                  variant={readinessFilter === f ? 'default' : 'outline'}
+                  className="h-7 text-xs capitalize"
+                  onClick={() => setReadinessFilter(f)}
+                >
+                  {f === 'missing' ? 'Missing assets' : f}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        {filteredReadiness.length === 0 ? (
+          <Card className="p-6 bg-card border-border text-sm text-muted-foreground">
+            {sceneReadiness.length === 0
+              ? 'No scenes yet. Create scenes in the Storyboard phase first.'
+              : 'No scenes match this filter.'}
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {filteredReadiness.map((s) => (
+              <Card key={s.scene_id} className="p-3 bg-card border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded bg-muted flex items-center justify-center text-xs font-semibold text-foreground/80 shrink-0">
+                    {s.scene_number}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-foreground truncate">{s.scene_title}</span>
+                      <span className="text-[11px] text-muted-foreground">{s.duration_seconds}s</span>
+                      <Badge
+                        variant="outline"
+                        className={s.ready ? 'border-primary/40 text-primary text-[10px]' : 'border-amber-500/40 text-amber-500 text-[10px]'}
+                      >
+                        {s.ready ? 'Ready' : 'Missing'}
+                      </Badge>
+                    </div>
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {/* Visual readiness */}
+                      <div className="rounded border border-border/60 p-2 space-y-1.5">
+                        <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Visual</div>
+                        <div className="flex items-center gap-2">
+                          {s.image?.image_url ? (
+                            <img src={s.image.image_url} alt="" className="w-16 h-10 object-cover rounded bg-black" />
+                          ) : (
+                            <div className="w-16 h-10 rounded bg-muted flex items-center justify-center text-[10px] text-muted-foreground">no image</div>
+                          )}
+                          {s.video?.video_url ? (
+                            <video src={s.video.video_url} className="w-16 h-10 object-cover rounded bg-black" muted preload="metadata" />
+                          ) : (
+                            <div className="w-16 h-10 rounded bg-muted flex items-center justify-center text-[10px] text-muted-foreground">no video</div>
+                          )}
+                          <div className="flex flex-col gap-0.5 ml-auto">
+                            <Badge variant="outline" className={s.has_image ? 'text-[9px] border-primary/40 text-primary' : 'text-[9px] border-amber-500/40 text-amber-500'}>
+                              {s.has_image ? 'Image ✓' : 'Image —'}
+                            </Badge>
+                            <Badge variant="outline" className={s.has_video ? 'text-[9px] border-primary/40 text-primary' : 'text-[9px] border-amber-500/40 text-amber-500'}>
+                              {s.has_video ? 'Video ✓' : 'Video —'}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Audio readiness */}
+                      <div className="rounded border border-border/60 p-2 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Audio</div>
+                          {s.is_silent && <Badge variant="outline" className="text-[9px]">silent mode</Badge>}
+                        </div>
+                        <div className="grid grid-cols-3 gap-1 text-[10px]">
+                          <div className={`flex items-center gap-1 px-1.5 py-1 rounded ${s.voice ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
+                            <Mic className="w-3 h-3" /> {s.voice ? 'Voice' : 'No voice'}
+                          </div>
+                          <div className={`flex items-center gap-1 px-1.5 py-1 rounded ${s.music ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
+                            <Music className="w-3 h-3" /> {s.music ? 'Music' : 'No music'}
+                          </div>
+                          <div className={`flex items-center gap-1 px-1.5 py-1 rounded ${s.sfx ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
+                            <Volume2 className="w-3 h-3" /> {s.sfx ? 'SFX' : 'No SFX'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
 
       {/* Included timeline */}
       <div>
