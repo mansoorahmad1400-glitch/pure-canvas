@@ -1,82 +1,45 @@
-## Step 9 — Final Export Phase (safe, no real MP4)
+# Step 10.1 — Expose uploaded assets inside phase workflow
 
-Goal: ship a working Export page that collects approved scenes, shows a validated timeline preview, and saves a manifest — with zero fake renders and no paid APIs.
+## Inspection summary
 
-### 1. Database migration (additive only)
-Add safe fields to existing `final_exports` table:
-- `export_manifest jsonb` — full timeline snapshot
-- `validation_notes text` — already exists, keep
-- `approved_scene_ids uuid[]` — already exists, keep
-- `preview_video_url text` nullable — already exists
-- `final_video_url text` nullable — already exists, never populate in this step
-- `status text` — extend allowed values to include `ready_for_render`
+- Storage, `project_assets` table, `AssetUploadButton`, `ProjectAssets` page, and the dashboard "Asset Library" link are already in place and working.
+- Images / Animate / Audio phases already include `AssetUploadButton` for upload-then-attach in one click — but there is **no way to reuse an asset that was uploaded earlier** (from the library, or from another scene) without re-uploading it.
+- This is the only meaningful gap for Step 10.1. Everything else the spec asks for (visibility, manual approval, preview/download/delete, persistence) already exists in the `ProjectAssets` page and the phase upload flow.
 
-No drops, no renames. Existing rows preserved.
+## What I'll add
 
-### 2. API layer — `src/lib/studio/api.js`
-Add `finalExportsApi`:
-- `getByProject(projectId)` — return latest manifest row
-- `saveManifest(projectId, manifest, status, validationNotes, approvedSceneIds)` — upsert one row per project
-- `markReadyForRender(projectId)` — sets `status = 'ready_for_render'`
+A single new component plus a button in each phase. No DB changes, no storage changes, no API changes, no external calls.
 
-### 3. New page — `src/pages/ExportPhase.jsx`
-Route registered in `App.jsx` at `/project/:id/export` BEFORE the catch-all phase placeholder, lazy-loaded like the other phases.
+### 1. `src/components/studio/AssetLibraryPicker.jsx` (new)
 
-Page sections:
-1. **Header** — project title, "Final Export" heading, helper text, Back to Dashboard, Refresh Approved Assets, Save Export Manifest, Ready for Render.
-2. **Readiness banner** — Ready / Not Ready, counts (included / excluded).
-3. **Included Timeline** — list of qualifying scenes with scene number, title, duration, video preview (or mock placeholder), audio summary chip (voice/music/SFX/mix/rhyme/silent), Ready badge.
-4. **Excluded Scenes** — collapsible, each with explicit reason: no approved video / no approved audio / storyboard not approved / image not approved / deleted-invalid.
-5. **Preview Player** — sequential per-scene playback of approved videos with the chosen audio asset; clearly labeled "Preview only — not a final MP4 render." No MediaRecorder, no canvas export.
-6. **Future renderer note** — small info block explaining backend MP4 renderer comes later.
+Reusable trigger + Dialog. Props:
+- `projectId`, `kind` (`'image' | 'video' | 'audio'`), optional `sceneId`, `assetRole`, `label`, `onPick({ publicUrl, asset })`.
 
-### 4. Inclusion rules (computed client-side)
-A scene is included only when ALL are true:
-- `storyboard_scenes` row exists, not soft-deleted
-- has at least one approved `scene_images` row (approval_status = 'approved')
-- has at least one approved `scene_videos` row
-- has at least one approved `project_audio_assets` row OR `storyboard_scenes.audio_mode = 'silent'` with audio approved-silent marker
+Behavior:
+- Queries `project_assets` filtered by `project_id` and `asset_type === kind` (uses existing `projectAssetsApi.listByProject` in `src/lib/studio/assetStorage.js`, then filters client-side — no new query needed).
+- Renders a grid of cards: thumbnail / `<video preload="metadata">` / `<audio>` preview, file name, approval status pill, role hint, "Use this" button.
+- Empty state points the user to the upload button or the Asset Library page.
+- Selecting an item calls `onPick({ publicUrl, asset })` and closes the dialog. No mutation happens inside the picker — the phase decides how to attach.
 
-Excluded scenes are listed with the first failing reason.
+### 2. Wire the picker into each phase (next to the existing `AssetUploadButton`)
 
-### 5. Manifest shape (saved to `final_exports.export_manifest`)
-```
-{
-  project_id,
-  generated_at,
-  scenes: [
-    { scene_id, scene_number, duration_seconds, video_url,
-      audio_asset_ids: [...], audio_url, audio_mode }
-  ],
-  excluded: [ { scene_id, scene_number, reason } ],
-  status: "ready_for_render" | "not_ready",
-  validation_notes
-}
-```
+- **`src/pages/ImagesPhase.jsx`** — `SceneImageCard`: pick image asset → call existing `onSaveRecord({ scene_id, prompt_used, image_url: publicUrl, provider: 'manual_upload' })` and set local preview. Mirrors the current `AssetUploadButton.onUploaded` handler.
+- **`src/pages/AnimatePhase.jsx`** — `SceneVideoCard`: pick video asset → call existing `onSaveRecord` with `video_url: publicUrl, provider: 'manual_upload', duration_seconds: asset.duration_seconds ?? scene.duration_seconds ?? 6`.
+- **`src/pages/AudioPhase.jsx`** — `SceneAudioCard`: for each audio slot (voice / music / sfx / rhyme_song) add a small "Library" button beside the existing Upload/URL/Mock buttons → call existing `onAddAsset({ scene_id, asset_type: type, provider: 'manual_upload', audio_url: publicUrl, ... })`.
 
-### 6. Buttons / actions
-- **Save Export Manifest** — writes/updates the row; toast confirmation.
-- **Ready for Render** — only enabled when ≥1 included scene; sets status `ready_for_render`.
-- **(No) Generate MP4** — replaced by an informational block. If user clicks Ready before any approved scenes exist, show friendly message; never disable the page.
+In each case the picker reuses the phase's existing upsert/insert function — same persistence path as upload — so records survive refresh exactly like today.
 
-### 7. Dashboard integration
-`ProjectDashboard.jsx` — update `computePhaseStatus` for the Export phase:
-- `ready_for_render` ⇒ phase shows "Ready for Render" (not complete)
-- `final_video_url` populated ⇒ complete (deferred to future renderer step)
+### 3. Dashboard
 
-### 8. Stability
-- React Query for loads with `loading / empty / error / retry` states
-- All async wrapped in try/catch/finally so loading always clears
-- No external API calls, no secrets, no gems/paywall logic
+No change. The "Asset Library" link is already present.
 
-### Files
-- `supabase/migrations/<ts>_final_exports_manifest.sql` — add `export_manifest jsonb`
-- `src/lib/studio/api.js` — add `finalExportsApi`
-- `src/pages/ExportPhase.jsx` — new page
-- `src/App.jsx` — register `/project/:id/export` route
-- `src/pages/ProjectDashboard.jsx` — recognize `ready_for_render` status
+## Out of scope (explicitly not touched)
 
-### Out of scope (explicit)
-- No FFmpeg, no cloud render, no MediaRecorder, no canvas export
-- No real MP4 produced, no `final_video_url` written
-- No changes to auth, admin, Storyboard, Characters, Images, Animate, Audio logic, or preview/resume fixes
+- Supabase Storage bucket, RLS, `project_assets` schema, `AssetUploadButton`, `ProjectAssets` page, routing, progress sync, mock/manual approval flow, project creation, storyboard, characters, export, billing.
+- No external AI / paid providers / FFmpeg / generation calls.
+
+## Verification
+
+- Build check.
+- Smoke-test routes: `/home`, `/projects`, `/project/:id`, `/project/:id/assets`, `/project/:id/images`, `/project/:id/animate`, `/project/:id/audio`, `/project/:id/export`.
+- Confirm: upload an image in Images phase → open another scene → "Pick from Library" shows it → selecting it attaches the same public URL → refresh page → attachment persists (because the underlying `scene_images` / `scene_videos` / `project_audio_assets` rows are written exactly the same way as the upload path already does).
