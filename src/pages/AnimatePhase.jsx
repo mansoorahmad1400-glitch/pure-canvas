@@ -292,13 +292,16 @@ function SceneVideoCard({
               assetRole="scene_video"
               label="Pick from Library"
               onPick={async ({ publicUrl, asset }) => {
+                const raw = asset?.duration_seconds ?? scene.duration_seconds ?? 6;
+                const num = Number(raw);
+                const normalizedDuration = Number.isFinite(num) ? Math.max(1, Math.round(num)) : 6;
                 await onSaveRecord({
                   scene_id: scene.id,
                   image_id: image.id,
                   prompt_used: prompt,
                   video_url: publicUrl,
                   provider: 'manual_upload',
-                  duration_seconds: asset?.duration_seconds ?? scene.duration_seconds ?? 6,
+                  duration_seconds: normalizedDuration,
                 });
               }}
             />
