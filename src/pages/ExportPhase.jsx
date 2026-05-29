@@ -227,8 +227,31 @@ export default function ExportPhase() {
     return buildTimeline(dataQ.data);
   }, [dataQ.data]);
 
+  const sceneReadiness = useMemo(() => {
+    if (!dataQ.data) return [];
+    return buildSceneReadiness(dataQ.data);
+  }, [dataQ.data]);
+
+  const summary = useMemo(() => {
+    const total = sceneReadiness.length;
+    const ready = sceneReadiness.filter((s) => s.ready).length;
+    const missingImage = sceneReadiness.filter((s) => !s.has_image).length;
+    const missingVideo = sceneReadiness.filter((s) => !s.has_video).length;
+    const missingAudio = sceneReadiness.filter((s) => !s.has_audio).length;
+    return { total, ready, missingImage, missingVideo, missingAudio };
+  }, [sceneReadiness]);
+
+  const [readinessFilter, setReadinessFilter] = useState('all'); // all | ready | missing
+
+  const filteredReadiness = useMemo(() => {
+    if (readinessFilter === 'ready') return sceneReadiness.filter((s) => s.ready);
+    if (readinessFilter === 'missing') return sceneReadiness.filter((s) => !s.ready);
+    return sceneReadiness;
+  }, [sceneReadiness, readinessFilter]);
+
   const readiness = timeline.included.length > 0 ? 'ready' : 'not_ready';
   const statusFromExisting = dataQ.data?.existing?.status;
+
 
   const handleRefresh = async () => {
     await qc.invalidateQueries({ queryKey: ['export-phase', id] });
