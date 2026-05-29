@@ -401,6 +401,139 @@ export default function ExportPhase() {
         </div>
       </Card>
 
+      {/* Export Readiness — scene by scene */}
+      <div>
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+          <h2 className="text-sm font-semibold text-foreground">Export Readiness</h2>
+          <div className="flex flex-wrap gap-1.5">
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/images`)}>
+              <ImageIcon className="w-3.5 h-3.5 mr-1" /> Images
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/animate`)}>
+              <Film className="w-3.5 h-3.5 mr-1" /> Animate
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/audio`)}>
+              <Volume2 className="w-3.5 h-3.5 mr-1" /> Audio
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => navigate(`/project/${id}/assets`)}>
+              <FolderOpen className="w-3.5 h-3.5 mr-1" /> Assets
+            </Button>
+          </div>
+        </div>
+
+        {/* Summary */}
+        <Card className="p-3 bg-card border-border mb-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+            <div><div className="text-lg font-semibold text-foreground">{summary.total}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">Scenes</div></div>
+            <div><div className="text-lg font-semibold text-primary">{summary.ready}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">Ready</div></div>
+            <div><div className="text-lg font-semibold text-amber-500">{summary.missingImage}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">No Image</div></div>
+            <div><div className="text-lg font-semibold text-amber-500">{summary.missingVideo}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">No Video</div></div>
+            <div><div className="text-lg font-semibold text-amber-500">{summary.missingAudio}</div><div className="text-[10px] uppercase tracking-wide text-muted-foreground">No Audio</div></div>
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
+            <Badge
+              variant="outline"
+              className={summary.ready === summary.total && summary.total > 0
+                ? 'border-primary/40 text-primary'
+                : 'border-amber-500/40 text-amber-500'}
+            >
+              {summary.total > 0 && summary.ready === summary.total ? 'All scenes ready' : `${summary.ready}/${summary.total} ready`}
+            </Badge>
+            <div className="flex gap-1">
+              {['all', 'ready', 'missing'].map((f) => (
+                <Button
+                  key={f}
+                  size="sm"
+                  variant={readinessFilter === f ? 'default' : 'outline'}
+                  className="h-7 text-xs capitalize"
+                  onClick={() => setReadinessFilter(f)}
+                >
+                  {f === 'missing' ? 'Missing assets' : f}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        {filteredReadiness.length === 0 ? (
+          <Card className="p-6 bg-card border-border text-sm text-muted-foreground">
+            {sceneReadiness.length === 0
+              ? 'No scenes yet. Create scenes in the Storyboard phase first.'
+              : 'No scenes match this filter.'}
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {filteredReadiness.map((s) => (
+              <Card key={s.scene_id} className="p-3 bg-card border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded bg-muted flex items-center justify-center text-xs font-semibold text-foreground/80 shrink-0">
+                    {s.scene_number}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-foreground truncate">{s.scene_title}</span>
+                      <span className="text-[11px] text-muted-foreground">{s.duration_seconds}s</span>
+                      <Badge
+                        variant="outline"
+                        className={s.ready ? 'border-primary/40 text-primary text-[10px]' : 'border-amber-500/40 text-amber-500 text-[10px]'}
+                      >
+                        {s.ready ? 'Ready' : 'Missing'}
+                      </Badge>
+                    </div>
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {/* Visual readiness */}
+                      <div className="rounded border border-border/60 p-2 space-y-1.5">
+                        <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Visual</div>
+                        <div className="flex items-center gap-2">
+                          {s.image?.image_url ? (
+                            <img src={s.image.image_url} alt="" className="w-16 h-10 object-cover rounded bg-black" />
+                          ) : (
+                            <div className="w-16 h-10 rounded bg-muted flex items-center justify-center text-[10px] text-muted-foreground">no image</div>
+                          )}
+                          {s.video?.video_url ? (
+                            <video src={s.video.video_url} className="w-16 h-10 object-cover rounded bg-black" muted preload="metadata" />
+                          ) : (
+                            <div className="w-16 h-10 rounded bg-muted flex items-center justify-center text-[10px] text-muted-foreground">no video</div>
+                          )}
+                          <div className="flex flex-col gap-0.5 ml-auto">
+                            <Badge variant="outline" className={s.has_image ? 'text-[9px] border-primary/40 text-primary' : 'text-[9px] border-amber-500/40 text-amber-500'}>
+                              {s.has_image ? 'Image ✓' : 'Image —'}
+                            </Badge>
+                            <Badge variant="outline" className={s.has_video ? 'text-[9px] border-primary/40 text-primary' : 'text-[9px] border-amber-500/40 text-amber-500'}>
+                              {s.has_video ? 'Video ✓' : 'Video —'}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Audio readiness */}
+                      <div className="rounded border border-border/60 p-2 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Audio</div>
+                          {s.is_silent && <Badge variant="outline" className="text-[9px]">silent mode</Badge>}
+                        </div>
+                        <div className="grid grid-cols-3 gap-1 text-[10px]">
+                          <div className={`flex items-center gap-1 px-1.5 py-1 rounded ${s.voice ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
+                            <Mic className="w-3 h-3" /> {s.voice ? 'Voice' : 'No voice'}
+                          </div>
+                          <div className={`flex items-center gap-1 px-1.5 py-1 rounded ${s.music ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
+                            <Music className="w-3 h-3" /> {s.music ? 'Music' : 'No music'}
+                          </div>
+                          <div className={`flex items-center gap-1 px-1.5 py-1 rounded ${s.sfx ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
+                            <Volume2 className="w-3 h-3" /> {s.sfx ? 'SFX' : 'No SFX'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+
       {/* Included timeline */}
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-2">Approved Timeline</h2>
