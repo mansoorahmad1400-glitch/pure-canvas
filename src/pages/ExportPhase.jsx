@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, RefreshCw, Save, Send, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Loader2, Info } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Save, Send, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Loader2, Info, Image as ImageIcon, Film, Mic, Music, Volume2, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
